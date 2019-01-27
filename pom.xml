@@ -179,6 +179,50 @@
         </executions>
       </plugin>
 
+      <!-- Package as Confluent Hub Component Archive file  -->
+        <plugin>
+          <groupId>io.confluent</groupId>
+          <artifactId>kafka-connect-maven-plugin</artifactId>
+          <version>${confluent.connect.plugin.version}</version>
+          <executions>
+            <execution>
+              <!-- <phase>package</phase> -->
+              <goals>
+                <goal>kafka-connect</goal>
+              </goals>
+              <configuration>
+                <title>Kafka Connect ArangoDB</title>
+                <documentationUrl>${project.url}/blob/master/README.md</documentationUrl>
+                <logo>docs/logos/arangodb-avocado-logo.png</logo>
+                <ownerLogo>docs/logos/jaredpetersen-logo.png</ownerLogo>
+                <ownerUsername>jaredpetersen</ownerUsername>
+                <ownerType>user</ownerType>
+                <ownerName>Jared Petersen</ownerName>
+                <ownerUrl>https://github.com/jaredpetersen</ownerUrl>
+                <supportProviderName>Open Source Community</supportProviderName>
+                <supportSummary>Support provided through community involvement.</supportSummary>
+                <supportUrl>${project.issueManagement.url}</supportUrl>
+                <confluentControlCenterIntegration>true</confluentControlCenterIntegration>
+                <componentTypes>
+                  <componentType>sink</componentType>
+                </componentTypes>
+                <requirements>
+                  <requirement>ArangoDB 3.4+</requirement>
+                </requirements>
+                <tags>
+                  <tag>arangodb</tag>
+                  <tag>arango</tag>
+                  <tag>graphdb</tag>
+                  <tag>graph</tag>
+                  <tag>nosql</tag>
+                  <tag>multimodel</tag>
+                  <tag>json</tag>
+                </tags>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
       <!-- Package as uber JAR -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -192,50 +236,6 @@
             </goals>
             <configuration>
               <minimizeJar>true</minimizeJar>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- Package as Confluent Hub Component Archive file  -->
-      <plugin>
-        <groupId>io.confluent</groupId>
-        <artifactId>kafka-connect-maven-plugin</artifactId>
-        <version>${confluent.connect.plugin.version}</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>kafka-connect</goal>
-            </goals>
-            <configuration>
-              <title>Kafka Connect ArangoDB</title>
-              <documentationUrl>${project.url}/blob/master/README.md</documentationUrl>
-              <logo>docs/logos/arangodb-avocado-logo.png</logo>
-              <ownerLogo>docs/logos/jaredpetersen-logo.png</ownerLogo>
-              <ownerUsername>jaredpetersen</ownerUsername>
-              <ownerType>user</ownerType>
-              <ownerName>Jared Petersen</ownerName>
-              <ownerUrl>https://github.com/jaredpetersen</ownerUrl>
-              <supportProviderName>Open Source Community</supportProviderName>
-              <supportSummary>Support provided through community involvement.</supportSummary>
-              <supportUrl>${project.issueManagement.url}</supportUrl>
-              <confluentControlCenterIntegration>true</confluentControlCenterIntegration>
-              <componentTypes>
-                <componentType>sink</componentType>
-              </componentTypes>
-              <requirements>
-                <requirement>ArangoDB 3.4+</requirement>
-              </requirements>
-              <tags>
-                <tag>arangodb</tag>
-                <tag>arango</tag>
-                <tag>graphdb</tag>
-                <tag>graph</tag>
-                <tag>nosql</tag>
-                <tag>multimodel</tag>
-                <tag>json</tag>
-              </tags>
             </configuration>
           </execution>
         </executions>
