@@ -1,0 +1,125 @@
+version: '3.7'
+
+# Development Kafka Cluster
+
+volumes:
+  zookeeper-secrets:
+  zookeeper-data:
+  zookeeper-logs:
+  kafka-secrets:
+  kafka-data:
+  connect-kafka-data:
+  connect-kafka-secrets:
+  connect-jars:
+  connect-secrets:
+  arangodb-data:
+  arangodb-app-data:
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION}
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_PORT}
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper-secrets:/etc/zookeeper/secrets
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-logs:/var/lib/zookeeper/log
+
+  broker:
+    image: confluentinc/cp-enterprise-kafka:${CONFLUENT_PLATFORM_VERSION}
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:${ZOOKEEPER_PORT}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:${BROKER_PORT},PLAINTEXT_HOST://localhost:${BROKER_HOST_PORT}
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:${BROKER_PORT}
+      CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:${ZOOKEEPER_PORT}
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      CONFLUENT_METRICS_ENABLE: 'true'
+      CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+    ports:
+      - ${BROKER_PORT}:9092
+      - ${BROKER_HOST_PORT}:29092
+    volumes:
+      - kafka-secrets:/etc/kafka/secrets
+      - kafka-data:/var/lib/kafka/data
+
+  connect:
+    build:
+      context: ../../
+      dockerfile: ./docs/development/connect/Dockerfile
+      args:
+        VERSION: ${CONFLUENT_PLATFORM_VERSION}
+    restart: unless-stopped
+    depends_on:
+      - broker
+      - arangodb
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: broker:${BROKER_PORT}
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect
+      CONNECT_REST_PORT: ${CONNECT_PORT}
+      CONNECT_GROUP_ID: kafka-connect
+      CONNECT_CONFIG_STORAGE_TOPIC: kafka-connect.config
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_TOPIC: kafka-connect.offsets
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_TOPIC: kafka-connect.status
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: "false"
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-${CONFLUENT_PLATFORM_VERSION}.jar
+      CONNECT_PRODUCER_INTERCEPTOR_CLASSES: io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor
+      CONNECT_CONSUMER_INTERCEPTOR_CLASSES: io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor
+      CONNECT_PLUGIN_PATH: /usr/share/java,/etc/kafka-connect/jars
+      CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
+    ports:
+      - ${CONNECT_PORT}:8083
+    volumes:
+      - connect-kafka-data:/var/lib/kafka/data
+      - connect-kafka-secrets:/etc/kafka/secrets
+      - connect-jars:/etc/kafka-connect/jars
+      - connect-secrets:/etc/kafka-connect/secrets
+
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:${CONFLUENT_PLATFORM_VERSION}
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+      - broker
+      - connect
+    ports:
+      - ${CONTROL_CENTER_PORT}:9021
+    environment:
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: broker:${BROKER_PORT}
+      CONTROL_CENTER_ZOOKEEPER_CONNECT: zookeeper:${ZOOKEEPER_PORT}
+      CONTROL_CENTER_CONNECT_CLUSTER: connect:${CONNECT_PORT}
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
+      CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
+      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
+      CONFLUENT_METRICS_TOPIC_REPLICATION: 1
+      PORT: ${CONTROL_CENTER_PORT}
+
+  arangodb:
+    build:
+      context: ./arangodb
+      args:
+        VERSION: ${ARANGODB_VERSION}
+    environment:
+      ARANGO_ROOT_PASSWORD:
+    ports:
+      - ${ARANGODB_PORT}:8529
+    volumes:
+      - arangodb-data:/var/lib/arangodb3
+      - arangodb-app-data:/var/lib/arangodb3-apps
