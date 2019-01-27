@@ -9,7 +9,7 @@ public class ArangoDbSinkTaskTests {
   @Test
   public void versionReturnsVersion() {
     final SinkTask task = new ArangoDbSinkTask();
-    assertEquals("1.0.0", task.version());
+    assertEquals("1.0.1", task.version());
   }
 
   @Test
