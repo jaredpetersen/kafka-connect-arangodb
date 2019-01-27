@@ -272,7 +272,7 @@
       </plugin>
 
       <!-- Sign artifacts -->
-      <plugin>
+      <!-- <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
         <version>1.6</version>
@@ -285,7 +285,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
+      </plugin> -->
 
       <!-- Deploy to Maven Central -->
       <plugin>
@@ -296,6 +296,34 @@
 
     </plugins>
   </build>
+
+  <profiles>
+    <!-- Only perform these actions when -Pdeploy is provided-->
+    <profile>
+      <id>deploy</id>
+      <build>
+        <plugins>
+
+          <!-- Sign artifacts -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <dependencies>
 
