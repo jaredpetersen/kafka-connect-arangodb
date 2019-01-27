@@ -1,5 +1,6 @@
 # Kafka Connect ArangoDB Connector
 [![Build Status](https://travis-ci.org/jaredpetersen/kafka-connect-arangodb.svg?branch=master)](https://travis-ci.org/jaredpetersen/kafka-connect-arangodb)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.jaredpetersen/kafka-connect-arangodb/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.jaredpetersen/kafka-connect-arangodb)
 
 Kafka Connect Sink Connector for ArangoDB
 

@@ -15,6 +15,6 @@ public class PropertiesLoaderTests {
   public void loadLoadsProperties() {
     final Properties properties = PropertiesLoader.load();
 
-    assertEquals("1.0.1", properties.get("version"));
+    assertEquals("1.0.2", properties.get("version"));
   }
 }
