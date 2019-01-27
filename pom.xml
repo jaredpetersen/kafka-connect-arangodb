@@ -31,6 +31,28 @@
     <url>${project.url}/issues</url>
   </issueManagement>
 
+  <developers>
+    <developer>
+      <id>jaredpetersen</id>
+      <name>Jared Petersen</name>
+      <url>https://github.com/jaredpetersen</url>
+      <timezone>-8</timezone>
+    </developer>
+  </developers>
+
+  <distributionManagement>
+    <repository>
+      <id>ossrh</id>
+      <name>Sonatype Staging Repository</name>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+    </repository>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <name>OSS Sonatype Nexus Snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>8</java.version>
@@ -217,6 +239,29 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- Sign artifacts -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Deploy to Maven Central -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>3.0.0-M1</version>
       </plugin>
 
     </plugins>
