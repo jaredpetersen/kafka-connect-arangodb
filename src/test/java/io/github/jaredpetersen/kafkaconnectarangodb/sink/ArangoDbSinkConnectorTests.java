@@ -15,7 +15,7 @@ public class ArangoDbSinkConnectorTests {
   @Test
   public void versionReturnsVersion() {
     final SinkConnector connector = new ArangoDbSinkConnector();
-    assertEquals("1.0.2", connector.version());
+    assertEquals("1.0.3", connector.version());
   }
 
   @Test
