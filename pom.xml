@@ -212,7 +212,6 @@
               <tags>
                 <tag>arangodb</tag>
                 <tag>arango</tag>
-                <tag>graphdb</tag>
                 <tag>graph</tag>
                 <tag>nosql</tag>
                 <tag>multimodel</tag>
@@ -223,20 +222,25 @@
         </executions>
       </plugin>
 
-      <!-- Package as uber JAR -->
+      <!-- Assemble JAR with dependencies -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.1</version>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.1.1</version>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <finalName>${project.name}-${project.version}</finalName>
+          <appendAssemblyId>false</appendAssemblyId>
+        </configuration>
         <executions>
           <execution>
+            <id>make-assembly</id>
             <phase>package</phase>
             <goals>
-              <goal>shade</goal>
+              <goal>single</goal>
             </goals>
-            <configuration>
-              <minimizeJar>true</minimizeJar>
-            </configuration>
           </execution>
         </executions>
       </plugin>
