@@ -5,7 +5,7 @@
 
   <groupId>io.github.jaredpetersen</groupId>
   <artifactId>kafka-connect-arangodb</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <packaging>jar</packaging>
 
   <name>kafka-connect-arangodb</name>
@@ -180,63 +180,67 @@
       </plugin>
 
       <!-- Package as Confluent Hub Component Archive file  -->
-        <plugin>
-          <groupId>io.confluent</groupId>
-          <artifactId>kafka-connect-maven-plugin</artifactId>
-          <version>${confluent.connect.plugin.version}</version>
-          <executions>
-            <execution>
-              <!-- <phase>package</phase> -->
-              <goals>
-                <goal>kafka-connect</goal>
-              </goals>
-              <configuration>
-                <title>Kafka Connect ArangoDB</title>
-                <documentationUrl>${project.url}/blob/master/README.md</documentationUrl>
-                <logo>docs/logos/arangodb-avocado-logo.png</logo>
-                <ownerLogo>docs/logos/jaredpetersen-logo.png</ownerLogo>
-                <ownerUsername>jaredpetersen</ownerUsername>
-                <ownerType>user</ownerType>
-                <ownerName>Jared Petersen</ownerName>
-                <ownerUrl>https://github.com/jaredpetersen</ownerUrl>
-                <supportProviderName>Open Source Community</supportProviderName>
-                <supportSummary>Support provided through community involvement.</supportSummary>
-                <supportUrl>${project.issueManagement.url}</supportUrl>
-                <confluentControlCenterIntegration>true</confluentControlCenterIntegration>
-                <componentTypes>
-                  <componentType>sink</componentType>
-                </componentTypes>
-                <requirements>
-                  <requirement>ArangoDB 3.4+</requirement>
-                </requirements>
-                <tags>
-                  <tag>arangodb</tag>
-                  <tag>arango</tag>
-                  <tag>graphdb</tag>
-                  <tag>graph</tag>
-                  <tag>nosql</tag>
-                  <tag>multimodel</tag>
-                  <tag>json</tag>
-                </tags>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-
-      <!-- Package as uber JAR -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.1</version>
+        <groupId>io.confluent</groupId>
+        <artifactId>kafka-connect-maven-plugin</artifactId>
+        <version>${confluent.connect.plugin.version}</version>
         <executions>
           <execution>
             <phase>package</phase>
             <goals>
-              <goal>shade</goal>
+              <goal>kafka-connect</goal>
             </goals>
             <configuration>
-              <minimizeJar>true</minimizeJar>
+              <title>Kafka Connect ArangoDB</title>
+              <documentationUrl>${project.url}/blob/master/README.md</documentationUrl>
+              <logo>docs/logos/arangodb-avocado-logo.png</logo>
+              <ownerLogo>docs/logos/jaredpetersen-logo.png</ownerLogo>
+              <ownerUsername>jaredpetersen</ownerUsername>
+              <ownerType>user</ownerType>
+              <ownerName>Jared Petersen</ownerName>
+              <ownerUrl>https://github.com/jaredpetersen</ownerUrl>
+              <supportProviderName>Open Source Community</supportProviderName>
+              <supportSummary>Support provided through community involvement.</supportSummary>
+              <supportUrl>${project.issueManagement.url}</supportUrl>
+              <confluentControlCenterIntegration>true</confluentControlCenterIntegration>
+              <componentTypes>
+                <componentType>sink</componentType>
+              </componentTypes>
+              <requirements>
+                <requirement>ArangoDB 3.4+</requirement>
+              </requirements>
+              <tags>
+                <tag>arangodb</tag>
+                <tag>arango</tag>
+                <tag>graph</tag>
+                <tag>nosql</tag>
+                <tag>multimodel</tag>
+                <tag>json</tag>
+              </tags>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Assemble JAR with dependencies -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.1.1</version>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <finalName>${project.name}-${project.version}</finalName>
+          <appendAssemblyId>false</appendAssemblyId>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
@@ -270,22 +274,6 @@
           </execution>
         </executions>
       </plugin>
-
-      <!-- Sign artifacts -->
-      <!-- <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.6</version>
-        <executions>
-          <execution>
-            <id>sign-artifacts</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>sign</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin> -->
 
       <!-- Deploy to Maven Central -->
       <plugin>
