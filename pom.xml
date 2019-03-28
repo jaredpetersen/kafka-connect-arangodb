@@ -272,6 +272,9 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <source>${java.version}</source>
+        </configuration>
       </plugin>
 
       <!-- Deploy to Maven Central -->
