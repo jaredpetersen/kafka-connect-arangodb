@@ -9,7 +9,7 @@ Kafka Connect ArangoDB is a Kafka Connector that translates record data into `RE
 
 Requires ArangoDB 3.4 or higher.
 
-A full example of how Kafka Connect ArangoDB can be integrated into a Kafka cluster is available in the [development documentation](docs/development/).
+A full example of how Kafka Connect ArangoDB can be integrated into a Kafka cluster is available in the [development documentation](/docs/development/).
 
 ### Record Formats and Structures
 The following record formats are supported:

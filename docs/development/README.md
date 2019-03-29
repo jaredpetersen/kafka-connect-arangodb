@@ -65,7 +65,5 @@ Assuming the application has already been compiled and packaged via `mvn clean p
 
 7. Clean up all containers and created volumes when you're done.
     ```bash
-    docker stop $(docker ps -aq)
-    docker rm $(docker ps -aq)
-    docker volume prune
+    docker-compose down -v
     ```
