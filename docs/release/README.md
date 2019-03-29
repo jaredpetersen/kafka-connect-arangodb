@@ -14,7 +14,7 @@ Only [@jaredpetersen](https://github.com/jaredpetersen) is able to deploy a new 
 1. Ensure that Kafka Connect ArangoDB's version was revised in the last merge to the master branch.
 2. Deploy the plugin to Maven Central for staging.
     ```
-    mvn clean deploy
+    mvn clean deploy -Pdeploy
     ```
 3. Log in to the [repository manager](https://oss.sonatype.org/) for Maven Central.
 4. Navigate to [Staging Repositories](https://oss.sonatype.org/#stagingRepositories) and locate the staged release in the listings.
