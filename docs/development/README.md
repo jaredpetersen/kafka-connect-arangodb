@@ -7,25 +7,47 @@ mvn clean test
 mvn clean package
 ```
 
-my-svc.my-namespace.svc.cluster.local
-
 ## Local Cluster
 A local cluster has been provided through the usage of [Docker](https://docs.docker.com/engine/docker-overview/) and [Kubernetes](https://docs.docker.com/compose/overview/) to exhibit how Kafka Connect ArangoDB can be integrated into a Kafka cluster. Developers may also find it useful for manual end-to-end testing.
 
-Assuming the application has already been compiled and packaged via `mvn clean package`:
+Assuming the application has already been compiled and packaged via `mvn clean package`.
 
-1. Start the cluster.
+### Setup
+
+1. Create the Kubernetes namespace.
     ```bash
-    docker-compose up --build
+    kubectl apply -f kafka-connect-arangodb-dev-namespace.yaml
     ```
 
-2. Create topic(s).
+2. Set up Zookeeper.
     ```bash
-    docker-compose exec broker kafka-topics --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic stream.airports
-    docker-compose exec broker kafka-topics --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic stream.flights
+    kubectl apply -f kafka/zookeeper/zookeeper-service.yaml
+    kubectl apply -f kafka/zookeeper/zookeeper-statefulset.yaml
     ```
 
-3. Configure Kafka Connect ArangoDB.
+3. Set up Kafka Brokers.
+    ```bash
+    kubectl apply -f kafka/broker/kafka-broker-service.yaml
+    kubectl apply -f kafka/broker/kafka-broker-statefulset.yaml
+    ```
+
+### Usage
+
+1. Create a Kafka Broker Client.
+    ```bash
+    kubectl apply -f kafka/broker/kafka-broker-client-pod.yaml
+    ```
+
+2. Create Kafka Topics using the Kafka Broker Client pod.
+    ```bash
+    kubectl -n kafka-connect-arangodb-dev exec -it kafka-broker-client -- /bin/bash
+    ```
+    ```bash
+    kafka-topics --zookeeper zookeeper-headless.kafka-connect-arangodb-dev:2181 --create --replication-factor 1 --partitions 1 --topic stream.airports
+    kafka-topics --zookeeper zookeeper-headless.kafka-connect-arangodb-dev:2181 --create --replication-factor 1 --partitions 1 --topic stream.flights
+    ```
+
+3. Configure Kafka Connect ArangoDB using any terminal.
     ```bash
     curl --request POST \
         --url http://localhost:8083/connectors \

@@ -1,6 +1,18 @@
 kind: Service
 apiVersion: v1
 metadata:
+  name: zookeeper
+  namespace: kafka-connect-arangodb-dev
+spec:
+  selector:
+    app: zookeeper
+  ports:
+  - name: client
+    port: 2181
+---
+kind: Service
+apiVersion: v1
+metadata:
   name: zookeeper-headless
   namespace: kafka-connect-arangodb-dev
 spec:
@@ -12,15 +24,3 @@ spec:
     port: 2888
   - name: leader-election
     port: 3888
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: zookeeper-client
-  namespace: kafka-connect-arangodb-dev
-spec:
-  selector:
-    app: zookeeper
-  ports:
-  - name: client
-    port: 2181

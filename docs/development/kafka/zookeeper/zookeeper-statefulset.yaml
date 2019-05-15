@@ -18,6 +18,12 @@ spec:
       containers:
       - name: zookeeper
         image: confluentinc/cp-zookeeper:5.1.0
+        command:
+        - "bash"
+        - "-c"
+        - |
+          ZOOKEEPER_SERVER_ID=$((${HOSTNAME##*-}+1)) \
+          /etc/confluent/docker/run
         ports:
         - name: client
           containerPort: 2181
@@ -31,12 +37,6 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /var/lib/zookeeper/data
-        command:
-        - "bash"
-        - "-c"
-        - |
-          ZOOKEEPER_SERVER_ID=$((${HOSTNAME##*-}+1)) \
-          /etc/confluent/docker/run
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -44,4 +44,4 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 1Gi
+          storage: 10Gi
