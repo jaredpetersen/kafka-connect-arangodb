@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zookeeper
+  namespace: kafka-connect-arangodb-dev
+spec:
+  selector:
+    matchLabels:
+      app: zookeeper
+  serviceName: zookeeper
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: zookeeper
+        image: confluentinc/cp-zookeeper:5.1.0
+        ports:
+        - name: client
+          containerPort: 2181
+        - name: server
+          containerPort: 2888
+        - name: leader-election
+          containerPort: 3888
+        env:
+        - name: ZOOKEEPER_CLIENT_PORT
+          value: "2181"
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/zookeeper/data
+        command:
+        - "bash"
+        - "-c"
+        - |
+          ZOOKEEPER_SERVER_ID=$((${HOSTNAME##*-}+1)) \
+          /etc/confluent/docker/run
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi

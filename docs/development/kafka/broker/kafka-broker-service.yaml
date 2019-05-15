@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: kafka-broker
+  namespace: kafka-connect-arangodb-dev
+spec:
+  selector:
+    app: kafka-broker
+  ports:
+  - name: blah
+    port: 9092
+  - name: blahblah
+    port: 29092

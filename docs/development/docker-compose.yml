@@ -16,6 +16,9 @@ volumes:
   arangodb-app-data:
 
 services:
+
+  # Kafka Cluster
+
   zookeeper:
     image: confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION}
     restart: unless-stopped
@@ -61,7 +64,8 @@ services:
     restart: unless-stopped
     depends_on:
       - broker
-      - arangodb
+      # - arangodb-a
+      # - arangodb-b
     environment:
       CONNECT_BOOTSTRAP_SERVERS: broker:${BROKER_PORT}
       CONNECT_REST_ADVERTISED_HOST_NAME: connect
@@ -111,15 +115,100 @@ services:
       CONFLUENT_METRICS_TOPIC_REPLICATION: 1
       PORT: ${CONTROL_CENTER_PORT}
 
-  arangodb:
-    build:
-      context: ./arangodb
-      args:
-        VERSION: ${ARANGODB_VERSION}
+  # ArangoDB Cluster
+
+  arangodb-agency-a:
+    image: arangodb/arangodb:${ARANGODB_VERSION}
+    restart: unless-stopped
     environment:
-      ARANGO_ROOT_PASSWORD:
+      ARANGO_NO_AUTH: '1'
+    command: arangod --server.endpoint tcp://0.0.0.0:5001 --agency.my-address=tcp://arangodb-agency:5001 --server.authentication false --agency.activate true --agency.size 3 --agency.endpoint tcp://arangodb-agency:5001 --agency.supervision true
+
+  arangodb-agency-b:
+    image: arangodb/arangodb:${ARANGODB_VERSION}
+    restart: unless-stopped
+    environment:
+      ARANGO_NO_AUTH: '1'
+    command: arangod --server.endpoint tcp://0.0.0.0:5002 --agency.my-address=tcp://arangodb-agency:5002 --server.authentication false --agency.activate true --agency.size 3 --agency.endpoint tcp://arangodb-agency:5002 --agency.supervision true
+
+  arangodb-agency-c:
+    image: arangodb/arangodb:${ARANGODB_VERSION}
+    restart: unless-stopped
+    environment:
+      ARANGO_NO_AUTH: '1'
+    command: arangod --server.endpoint tcp://0.0.0.0:5003 --agency.my-address=tcp://arangodb-agency:5003 --server.authentication false --agency.activate true --agency.size 3 --agency.endpoint tcp://arangodb-agency:5003 --agency.supervision true
+
+  arangodb-coordinator-a:
+    image: arangodb/arangodb:${ARANGODB_VERSION}
+    restart: unless-stopped
+    depends_on:
+      - arangodb-agency-a
+      - arangodb-agency-b
+      - arangodb-agency-c
+    environment:
+      ARANGO_NO_AUTH: '1'
+    command: arangod --server.endpoint tcp://0.0.0.0:7001 --cluster.my-address tcp://arangodb-coordinator:7001 --cluster.my-role COORDINATOR --cluster.agency-endpoint tcp://arangodb-agency:5001 --cluster.agency-endpoint tcp://arangodb-agency:5002 --cluster.agency-endpoint tcp://arangodb-agency:5003
     ports:
-      - ${ARANGODB_PORT}:8529
-    volumes:
-      - arangodb-data:/var/lib/arangodb3
-      - arangodb-app-data:/var/lib/arangodb3-apps
+      - 7001:7001
+
+  arangodb-coordinator-b:
+    image: arangodb/arangodb:${ARANGODB_VERSION}
+    restart: unless-stopped
+    depends_on:
+      - arangodb-agency-a
+      - arangodb-agency-b
+      - arangodb-agency-c
+    environment:
+      ARANGO_NO_AUTH: '1'
+    command: arangod --server.endpoint tcp://0.0.0.0:7002 --cluster.my-address tcp://arangodb-coordinator:7002 --cluster.my-role COORDINATOR --cluster.agency-endpoint tcp://arangodb-agency:5001 --cluster.agency-endpoint tcp://arangodb-agency:5002 --cluster.agency-endpoint tcp://arangodb-agency:5003
+    ports:
+      - 7002:7002
+
+  arangodb-coordinator-c:
+    image: arangodb/arangodb:${ARANGODB_VERSION}
+    restart: unless-stopped
+    depends_on:
+      - arangodb-agency-a
+      - arangodb-agency-b
+      - arangodb-agency-c
+    environment:
+      ARANGO_NO_AUTH: '1'
+    command: arangod --server.endpoint tcp://0.0.0.0:7003 --cluster.my-address tcp://arangodb-coordinator:7003 --cluster.my-role COORDINATOR --cluster.agency-endpoint tcp://arangodb-agency:5001 --cluster.agency-endpoint tcp://arangodb-agency:5002 --cluster.agency-endpoint tcp://arangodb-agency:5003
+    ports:
+      - 7003:7003
+
+  arangodb-server-a:
+    image: arangodb/arangodb:${ARANGODB_VERSION}
+    restart: unless-stopped
+    depends_on:
+      - arangodb-agency-a
+      - arangodb-agency-b
+      - arangodb-agency-c
+    environment:
+      ARANGO_NO_AUTH: '1'
+    command: arangod --server.endpoint tcp://0.0.0.0:6001 --cluster.my-address tcp://arangodb-server-a:6001 --cluster.my-role DBSERVER --cluster.agency-endpoint tcp://arangodb-agency:5001 --cluster.agency-endpoint tcp://arangodb-agency:5002 --cluster.agency-endpoint tcp://arangodb-agency:5003
+
+  arangodb-server-b:
+    image: arangodb/arangodb:${ARANGODB_VERSION}
+    restart: unless-stopped
+    depends_on:
+      - arangodb-agency-a
+      - arangodb-agency-b
+      - arangodb-agency-c
+    environment:
+      ARANGO_NO_AUTH: '1'
+    command: arangod --server.endpoint tcp://0.0.0.0:6001 --cluster.my-address tcp://arangodb-server-b:6001 --cluster.my-role DBSERVER --cluster.agency-endpoint tcp://arangodb-agency:5001 --cluster.agency-endpoint tcp://arangodb-agency:5002 --cluster.agency-endpoint tcp://arangodb-agency:5003
+
+  arangodb-server-c:
+    image: arangodb/arangodb:${ARANGODB_VERSION}
+    restart: unless-stopped
+    depends_on:
+      - arangodb-agency-a
+      - arangodb-agency-b
+      - arangodb-agency-c
+    environment:
+      ARANGO_NO_AUTH: '1'
+    command: arangod --server.endpoint tcp://0.0.0.0:6001 --cluster.my-address tcp://arangodb-server-c:6001 --cluster.my-role DBSERVER --cluster.agency-endpoint tcp://arangodb-agency:5001 --cluster.agency-endpoint tcp://arangodb-agency:5002 --cluster.agency-endpoint tcp://arangodb-agency:5003
+    # volumes:
+    #   - arangodb-data:/var/lib/arangodb3
+    #   - arangodb-app-data:/var/lib/arangodb3-apps

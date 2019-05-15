@@ -7,8 +7,10 @@ mvn clean test
 mvn clean package
 ```
 
-## Local Kafka Cluster
-A local Kafka cluster has been provided through the usage of [Docker](https://docs.docker.com/engine/docker-overview/) and [Docker Compose](https://docs.docker.com/compose/overview/) to exhibit how Kafka Connect ArangoDB can be integrated into a Kafka cluster. Developers may also find it useful for manual end-to-end testing.
+my-svc.my-namespace.svc.cluster.local
+
+## Local Cluster
+A local cluster has been provided through the usage of [Docker](https://docs.docker.com/engine/docker-overview/) and [Kubernetes](https://docs.docker.com/compose/overview/) to exhibit how Kafka Connect ArangoDB can be integrated into a Kafka cluster. Developers may also find it useful for manual end-to-end testing.
 
 Assuming the application has already been compiled and packaged via `mvn clean package`:
 
