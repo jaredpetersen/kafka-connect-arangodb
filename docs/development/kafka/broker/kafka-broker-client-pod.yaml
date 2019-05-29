@@ -6,7 +6,7 @@ metadata:
 spec:
   containers:
   - name: kafka-broker-client
-    image: confluentinc/cp-enterprise-kafka:5.1.0
+    image: confluentinc/cp-enterprise-kafka:5.2.1
     command:
     - sh
     - -c

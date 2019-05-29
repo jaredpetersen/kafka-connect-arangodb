@@ -16,8 +16,7 @@ spec:
     spec:
       containers:
       - name: kafka-broker
-        image: confluentinc/cp-enterprise-kafka:5.1.0
-        # export KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://${POD_NAME}.kafka-broker-headless.${POD_NAMESPACE}:9092,PLAINTEXT_HOST://${POD_NAME}.kafka-broker-headless.${POD_NAMESPACE}:29092 && \
+        image: confluentinc/cp-enterprise-kafka:5.2.1
         command:
         - sh
         - -exc
@@ -25,6 +24,7 @@ spec:
           export KAFKA_BROKER_ID=${HOSTNAME##*-} && \
           export KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://${POD_IP}:9092,PLAINTEXT_HOST://${POD_IP}:29092 && \
           exec /etc/confluent/docker/run
+        # export KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://${POD_NAME}.kafka-broker-headless.${POD_NAMESPACE}:9092,PLAINTEXT_HOST://${POD_NAME}.kafka-broker-headless.${POD_NAMESPACE}:29092 && \
         ports:
         - name: broker
           containerPort: 9092

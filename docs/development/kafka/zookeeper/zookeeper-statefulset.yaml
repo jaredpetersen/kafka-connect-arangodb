@@ -17,7 +17,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: zookeeper
-        image: confluentinc/cp-zookeeper:5.1.0
+        image: confluentinc/cp-zookeeper:5.2.1
         command:
         - "bash"
         - "-c"
