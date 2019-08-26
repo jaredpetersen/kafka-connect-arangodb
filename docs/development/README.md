@@ -10,26 +10,41 @@ mvn clean package
 ## Local Cluster
 A local cluster has been provided through the usage of [Docker](https://docs.docker.com/engine/docker-overview/) and [Kubernetes](https://docs.docker.com/compose/overview/) to exhibit how Kafka Connect ArangoDB can be integrated into a Kafka cluster. Developers may also find it useful for manual end-to-end testing.
 
-Assuming the application has already been compiled and packaged via `mvn clean package`.
+Assumes the application has already been compiled and packaged via `mvn clean package`.
 
 ### Setup
 
-1. Create the Kubernetes namespace.
+`minikube start --vm-driver=hyperkit --cpus=2 --memory=8g`
+
+1. Set up the namespace:
     ```bash
-    kubectl apply -f kafka-connect-arangodb-dev-namespace.yaml
+    kubectl apply -f namespace.yaml
     ```
 
-2. Set up Zookeeper.
+2. Install the operators:
+
+    Arangodb:
     ```bash
-    kubectl apply -f kafka/zookeeper/zookeeper-service.yaml
-    kubectl apply -f kafka/zookeeper/zookeeper-statefulset.yaml
+    kubectl apply -f https://raw.githubusercontent.com/arangodb/kube-arangodb/0.3.14/manifests/arango-crd.yaml
+    kubectl apply -f https://raw.githubusercontent.com/arangodb/kube-arangodb/0.3.14/manifests/arango-deployment.yaml
     ```
 
-3. Set up Kafka Brokers.
+    Kafka:
     ```bash
-    kubectl apply -f kafka/broker/kafka-broker-service.yaml
-    kubectl apply -f kafka/broker/kafka-broker-statefulset.yaml
+    # TODO
     ```
+
+    Zookeeper:
+    ```bash
+    # TODO
+    ```
+
+3. Create the cluster:
+    ```bash
+    kubectl apply -f arangodeployment.yaml
+    ```
+
+To uninstall, run `kubectl delete -f <manifest>` in reverse order.
 
 ### Usage
 
@@ -83,7 +98,7 @@ Assuming the application has already been compiled and packaged via `mvn clean p
     >{"id":4}|{"_from":"airports/BOI","_to":"airports/PDX","depTime":"2008-01-16T02:03:00.000Z","arrTime":"2008-01-16T03:09:00.000Z","uniqueCarrier":"WN","flightNumber":1488,"tailNumber":"N242WN","distance":344}
     ```
 
-5. View records in the [database](http://localhost:8529). Username is `root` and password is `password`. All records should be stored in the `development` database.
+5. View records in the database. Get the IP address from running `kubectl get service` and locating `arangodeployment-ea` in the listing. Always put `https://` in front of the IP. Username is `root` and the password is empty. All records should be stored in the `development` database.
 
 6. View cluster health and logging in the [Confluent Control Center](http://localhost:9021).
 

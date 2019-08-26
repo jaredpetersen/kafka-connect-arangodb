@@ -1,0 +1,10 @@
+apiVersion: database.arangodb.com/v1alpha
+kind: ArangoDeployment
+metadata:
+  name: arangodeployment
+spec:
+  mode: Cluster
+  image: arangodb/arangodb:3.4.7
+  bootstrap:
+    passwordSecretNames:
+      root: "asdf"
