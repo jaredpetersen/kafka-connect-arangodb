@@ -1,0 +1,139 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    component: operator
+  name: cc-operator
+rules:
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  - customresourcedefinitions/status
+  verbs:
+  - '*'
+- apiGroups:
+  - operator.confluent.cloud
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  - deployments/scale
+  - deployments/status
+  - replicasets
+  - replicasets/scale
+  - replicasets/status
+  - statefulsets
+  - statefulsets/scale
+  - statefulsets/status
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - endpoints
+  - events
+  - persistentvolumeclaims
+  - pods
+  - secrets
+  - services
+  verbs:
+  - '*'
+- apiGroups:
+  - policy
+  resources:
+  - poddisruptionbudgets
+  verbs:
+  - '*'
+
+---
+
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  labels:
+    component: operator
+  name: default-cc-operator
+subjects:
+- kind: ServiceAccount
+  name: cc-operator
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: cc-operator
+  apiGroup: rbac.authorization.k8s.io
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    component: operator
+  name: cc-operator
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    component: operator
+  name: operator-licensing
+type: Opaque
+data:
+  publicKey: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF2YUd5OFRPZGJDTXlTTTd6cVpzeApuNjJ5dUUrQmhJUGxjOXo5Y3RyWCt0QldOQ0NKZVBaYktIVFpTOXVLTGVLVWk5dTA3dHMvMzVYUm5FNEFURDZxCmx3am5Tb0pPa2VJWGNZaUorWEdFeE4xb1JFOFJsNW90dmRtSkVzYjlZNkpzZmUybFJDQ3NaTng2azFzMU5tUUYKUjR3blJpS3lsSWlZSjl1V1VHZkgxOEpLWnFNOHo5UXFrWi8relFrekhOWXNYbi9ZeVJ1RElRWGVVU2VjaHI5MwpKanQ3OUFpa3NraWNvVDA0bHF6L0dhSHoyV0pFeXV2TExFMWpOQk9Db21LbDA1UWIreXZKbUdudC83SFg2SFQ3CjNobkNYYnNsd3R6cDBDbWVHT2lKUmJKeGJhaGtURnFoMW9LcVpYVURDWnJLQ05OUnZYcU4vUUhxbmF3bzZrSnkKOHdJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    component: operator
+  name: cc-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cc-operator
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cc-operator
+    spec:
+      containers:
+      - args:
+        - --proxy=private
+        - --provider=on-prem
+        - --prefixed-secrets
+        - --disable-hostpath
+        - --disable-pod-controller
+        - --enable-logical-cluster-secrets=false
+        image: docker.io/confluentinc/cp-operator-service:0.176.1
+        imagePullPolicy: Always
+        name: cc-operator
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+      # terminationMessagePath: /dev/termination-log
+      # terminationMessagePolicy: File
+      serviceAccountName: cc-operator
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30

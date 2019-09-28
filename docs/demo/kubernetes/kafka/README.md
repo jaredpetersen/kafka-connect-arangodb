@@ -1,0 +1,2 @@
+# Kafka
+Apache ZooKeeper, Apache Kafka, and Confluent Kafka Connect, managed and automated by the [Confluent Operator](https://docs.confluent.io/current/installation/operator/index.html) for Kubernetes.

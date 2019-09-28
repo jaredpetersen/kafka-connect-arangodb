@@ -1,0 +1,35 @@
+apiVersion: cluster.confluent.com/v1alpha1
+kind: ZookeeperCluster
+metadata:
+  labels:
+    component: zookeeper
+  name: zookeeper
+spec:
+  replicas: 3
+  image: docker.io/confluentinc/cp-zookeeper-operator:5.3.1.0
+  initContainers:
+  - name: init-container
+    image: docker.io/confluentinc/cp-init-container-operator:5.3.1.0
+    command:
+    - /bin/sh
+    - -xc
+    args:
+    - until [ -f /mnt/config/pod/zookeeper/template.jsonnet ]; do echo "file not found"; sleep 10s; done; /opt/startup.sh
+  terminationGracePeriodInSecond: 180
+  jvmConfig:
+    heapSize: 4G
+  podSecurityContext:
+    fsGroup: 1001
+    runAsUser: 1001
+    runAsNonRoot: true
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    storage:
+    - name: data
+      capacity: 10Gi
+    - name: txnlog
+      capacity: 10Gi
+  zones:
+    - myzones

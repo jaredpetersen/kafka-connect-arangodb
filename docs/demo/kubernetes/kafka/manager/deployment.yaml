@@ -1,0 +1,181 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    component: manager
+  name: cc-manager
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - cluster.confluent.com
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- apiGroups:
+  - operator.confluent.cloud
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- apiGroups:
+  - operator.confluent.cloud
+  resources:
+  - physicalstatefulclusters
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - operator.confluent.cloud
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- apiGroups:
+  - cluster.confluent.com
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- apiGroups:
+  - policy
+  resources:
+  - poddisruptionbudgets
+  verbs:
+  - '*'
+
+---
+
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  labels:
+    component: manager
+  name: default-cc-manager
+subjects:
+- kind: ServiceAccount
+  name: cc-manager
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: cc-manager
+  apiGroup: rbac.authorization.k8s.io
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    component: manager
+  name: cc-manager
+  namespace: default
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    component: manager
+  name: cc-manager
+  namespace:  default
+  # component: cc-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cc-manager
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: "7778"
+        prometheus.io/scrape: "true"
+      labels:
+        app: cc-manager
+    spec:
+      containers:
+      - name: cc-manager
+        image: docker.io/confluentinc/cp-manager:0.30.0
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 200m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+      # terminationMessagePath: /dev/termination-log
+      # terminationMessagePolicy: File
+      serviceAccount: cc-manager
+      serviceAccountName: cc-manager
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
