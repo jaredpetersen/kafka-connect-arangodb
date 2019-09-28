@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: Secret
-metadata:
-  labels:
-    component: zookeeper
-  name: zookeeper-apikeys
-type: Opaque
-data:
-  apikeys.json : eyAia2V5cyI6IHsgInRlc3QiOiB7ICJzYXNsX21lY2hhbmlzbSI6ICJQTEFJTiIsICJoYXNoZWRfc2VjcmV0IjogInRlc3QxMjMiLCAiaGFzaF9mdW5jdGlvbiI6ICJub25lIiwgImxvZ2ljYWxfY2x1c3Rlcl9pZCI6ICJkZWZhdWx0IiwgInVzZXJfaWQiOiAidGVzdCIsICJzZXJ2aWNlX2FjY291bnQiOiBmYWxzZX19fQ==
