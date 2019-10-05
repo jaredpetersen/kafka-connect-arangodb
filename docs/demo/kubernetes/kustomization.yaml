@@ -1,6 +1,5 @@
 namespace: kca-demo
 resources:
 - namespace.yaml
-- kafka/operator/operator.yaml
-- kafka/kafka/kafka.yaml
-- kafka/kafka/kafkaConnect.yaml
+- zookeeper/statefulset.yaml
+- zookeeper/service.yaml
