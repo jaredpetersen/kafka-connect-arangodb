@@ -1,5 +1,5 @@
 # Demo
-Let's run Kafka Connect ArangoDB in a local Kafka + ArangoDB Kubernetes cluster via MiniKube so that we can get a feel for how it all works together.
+Let's run Kafka Connect ArangoDB in a local Apache Kafka + ArangoDB Kubernetes cluster via MiniKube so that we can get a feel for how it all works together.
 
 ## Setup
 ### Minikube
@@ -7,11 +7,11 @@ Let's set up the cluster. We're going to use Minikube for this so [make sure you
 
 Set up the cluster with a docker registry and some extra juice:
 ```bash
-minikube start --cpus 2 --memory 8g
+minikube start --cpus 2 --memory 10g
 ```
 
 ### Docker
-Now that we have a cluster, we'll need a Docker image that contains the Kafka Connect ArangoDB plugin. We don't publish a Docker image to public Docker registries for consumption since you will usually end up with multiple Kafka Connect plugins on one image.
+Now that we have a cluster, we'll need a Docker image that contains the Kafka Connect ArangoDB plugin. We don't publish a Docker image to public Docker registries since you will usually install multiple Kafka Connect plugins on one image. Additionally, that base image may vary depending on your preferences and use case.
 
 Navigate to `/demo/docker` and run the following commands to download the plugin and build the image:
 ```bash
@@ -22,17 +22,16 @@ docker build --tag jaredpetersen/kafka-connect-arangodb:1.0.4 .
 
 Alternatively, build from source with `mvn package` at the root of the repository to get the JAR file.
 
-### Kubernetes Manifests
-Everything's ready to go! Let's deploy the manifests:
-```bash
-kubectl apply -k kubernetes
-```
-
-
 Tag the Docker image for the minikube registry and push it:
 ```
 docker tag jaredpetersen/kafka-connect-arangodb:1.0.4 $(minikube ip):5000/jaredpetersen/kafka-connect-arangodb:1.0.4
 docker push $(minikube ip):5000/jaredpetersen/kafka-connect-arangodb:1.0.4
+```
+
+### Kubernetes Manifests
+Deploy the manifests:
+```bash
+kubectl apply -k kubernetes
 ```
 
 ## Usage

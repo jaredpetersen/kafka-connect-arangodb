@@ -1,3 +1,6 @@
-# namespace: kafka-connect-arangodb-dev
+namespace: kca-demo
 resources:
 - namespace.yaml
+- kafka/operator/operator.yaml
+- kafka/kafka/kafka.yaml
+- kafka/kafka/kafkaConnect.yaml

@@ -1,6 +1,4 @@
-FROM confluentinc/cp-kafka-connect-base:5.3.1
-
-ENV CONNECT_PLUGINS_DIR /usr/share/java/kafka-connect
-
-# Install Kafka Connect ArangoDB
-COPY kafka-connect-arangodb-*.jar ${CONNECT_PLUGINS_DIR}/kafka-connect-arangodb/
+FROM strimzi/kafka:0.13.0-kafka-2.3.0
+USER root:root
+COPY kafka-connect-arangodb-*.jar /opt/kafka/plugins/
+USER 1001
