@@ -1,4 +1,3 @@
-FROM strimzi/kafka:0.13.0-kafka-2.3.0
-USER root:root
-COPY kafka-connect-arangodb-*.jar /opt/kafka/plugins/
-USER 1001
+ARG VERSION=5.3.1
+FROM confluentinc/cp-kafka-connect-base:${VERSION}
+COPY kafka-connect-arangodb-*.jar /etc/kafka-connect/jars/kafka-connect-arangodb/

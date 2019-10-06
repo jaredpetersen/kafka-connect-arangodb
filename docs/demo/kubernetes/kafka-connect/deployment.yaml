@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-connect
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: kafka-connect
+  template:
+    metadata:
+      labels:
+        app: kafka-connect
+    spec:
+      containers:
+      - name: kafka-connect
+        image: jaredpetersen/kafka-connect-arangodb:1.0.4
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8083
+          name: rest
+        env:
+        - name: CONNECT_BOOTSTRAP_SERVERS
+          value: kafka-broker-0.kafka-broker:9092,kafka-broker-1.kafka-broker:9092,kafka-broker-2.kafka-broker:9092
+        - name: CONNECT_REST_ADVERTISED_HOST_NAME
+          value: connect
+        - name: CONNECT_REST_PORT
+          value: "8083"
+        - name: CONNECT_GROUP_ID
+          value: kafka-connect
+        - name: CONNECT_CONFIG_STORAGE_TOPIC
+          value: kafka-connect.config
+        - name: CONNECT_OFFSET_STORAGE_TOPIC
+          value: kafka-connect.offsets
+        - name: CONNECT_STATUS_STORAGE_TOPIC
+          value: kafka-connect.status
+        - name: CONNECT_KEY_CONVERTER
+          value: org.apache.kafka.connect.json.JsonConverter
+        - name: CONNECT_VALUE_CONVERTER
+          value: org.apache.kafka.connect.json.JsonConverter
+        # Remove internal key converters after https://github.com/confluentinc/cp-docker-images/issues/797
+        - name: CONNECT_INTERNAL_KEY_CONVERTER
+          value: org.apache.kafka.connect.json.JsonConverter
+        - name: CONNECT_INTERNAL_VALUE_CONVERTER
+          value: org.apache.kafka.connect.json.JsonConverter
+        readinessProbe:
+          httpGet:
+            path: /
+            port: rest
+          initialDelaySeconds: 15
+          periodSeconds: 3
+        resources: {}

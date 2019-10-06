@@ -5,3 +5,5 @@ resources:
 - zookeeper/service.yaml
 - kafka-broker/statefulset.yaml
 - kafka-broker/service.yaml
+- kafka-connect/deployment.yaml
+- kafka-connect/service.yaml

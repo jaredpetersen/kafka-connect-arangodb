@@ -15,8 +15,7 @@ spec:
     spec:
       containers:
       - name: kafka-broker
-        image: confluentinc/cp-enterprise-kafka:5.1.0
-        # Use downward api after https://github.com/kubernetes/kubernetes/pull/68719 is merged
+        image: confluentinc/cp-enterprise-kafka:5.3.1
         command:
         - /bin/bash
         args:
