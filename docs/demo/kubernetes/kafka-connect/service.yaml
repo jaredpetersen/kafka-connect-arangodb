@@ -5,7 +5,7 @@ metadata:
 spec:
   selector:
     app: kafka-connect
-  type: LoadBalancer
+  type: NodePort
   ports:
   - port: 8083
     name: rest

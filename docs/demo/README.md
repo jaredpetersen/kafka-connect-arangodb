@@ -13,27 +13,21 @@ minikube start --cpus 2 --memory 10g
 ### Docker
 Now that we have a cluster, we'll need a Docker image that contains the Kafka Connect ArangoDB plugin. We don't publish a Docker image to public Docker registries since you will usually install multiple Kafka Connect plugins on one image. Additionally, that base image may vary depending on your preferences and use case.
 
-Navigate to `/demo/docker` and run the following commands to download the plugin and build the image:
+Navigate to `/demo/docker` and run the following commands in a separate terminal to download the plugin and build the image:
 ```bash
 curl -O https://search.maven.org/remotecontent?filepath=io/github/jaredpetersen/kafka-connect-arangodb/1.0.4/kafka-connect-arangodb-1.0.4.jar
 eval $(minikube docker-env)
-docker build --tag jaredpetersen/kafka-connect-arangodb:1.0.4 .
+docker build -t jaredpetersen/kafka-connect-arangodb:1.0.4 .
 ```
 
-Alternatively, build from source with `mvn package` at the root of the repository to get the JAR file.
+Close out this terminal when you're done -- we want to go back to our normal Docker environment.
 
-Tag the Docker image for the minikube registry and push it:
-```
-docker tag jaredpetersen/kafka-connect-arangodb:1.0.4 $(minikube ip):5000/jaredpetersen/kafka-connect-arangodb:1.0.4
-docker push $(minikube ip):5000/jaredpetersen/kafka-connect-arangodb:1.0.4
-```
+Alternatively, build from source with `mvn package` at the root of this repository to get the JAR file.
 
 ### Kubernetes Manifests
-We have our minikube cluster and we have our Docker image. Let's start running everything.
+Let's start running everything. We're going to be using [kube-arangodb](https://github.com/arangodb/kube-arangodb) to help us manage our ArangoDB cluster and just plain manifests for Zookeeper, Apache Kafka, and Kafka Connect.
 
-We're going to be using [kube-arangodb](https://github.com/arangodb/kube-arangodb) to help us manage our ArangoDB cluster and just plain manifests for Zookeeper, Apache Kafka, and Kafka Connect.
-
-Apply the manifests:
+Apply the manifests (you may have to give this a couple of tries due to race conditions):
 ```bash
 kubectl apply -k kubernetes
 ```
@@ -44,6 +38,16 @@ kubectl -n kca-demo get pods
 ```
 
 ## Usage
+### Database
+Log in to the database. Minikube will take you there by running:
+```bash
+minikube -n kca-demo service arangodb-ea
+```
+
+The username is `root` and the password is blank.
+
+Create a new database with the name `demo`. Switch to this new database and create a document collection with the name `airports` and an edge collection with the name `flights`.
+
 ### Create Kafka Topics
 Create an interactive ephemeral query pod:
 ```bash
@@ -57,22 +61,28 @@ kafka-topics --create --zookeeper zookeeper-0.zookeeper:2181 --replication-facto
 ```
 
 ### Configure Kafka Connect ArangoDB
-Send a request to the Kafka Connect REST API:
+Get the host information for Kafka connect and the database:
+```
+minikube -n kca-demo service kafka-connect --url
+minikube -n kca-demo service arangodb-ea --url
+```
+
+Send a request to the Kafka Connect REST API to configure it to use Kafka Connect ArangoDB, replacing `KAFKA-CONNECT-HOST`, `KAFKA-CONNECT-PORT`, `ARANGODB-HOST`, and `ARANGODB-PORT` with the appropriate values from the previous commands:
 ```bash
 curl --request POST \
-    --url "$(minikube -n kca-demo service kafka-connect --url)/connectors" \
+    --url "KAFKA-CONNECT-HOST:KAFKA-CONNECT-PORT/connectors" \
     --header 'content-type: application/json' \
     --data '{
-        "name": "development-arangodb-connector",
+        "name": "demo-arangodb-connector",
         "config": {
             "connector.class": "io.github.jaredpetersen.kafkaconnectarangodb.sink.ArangoDbSinkConnector",
             "tasks.max": "1",
             "topics": "stream.airports,stream.flights",
-            "arangodb.host": "arangodb",
-            "arangodb.port": 8529,
+            "arangodb.host": "ARANGODB-HOST",
+            "arangodb.port": ARANGODB-PORT,
             "arangodb.user": "root",
-            "arangodb.password": "password",
-            "arangodb.database.name": "development"
+            "arangodb.password": "",
+            "arangodb.database.name": "demo"
         }
     }'
 ```
@@ -101,15 +111,8 @@ kafka-console-producer --broker-list kafka-broker-0.kafka-broker:9092 --topic st
 >{"id":4}|{"_from":"airports/BOI","_to":"airports/PDX","depTime":"2008-01-16T02:03:00.000Z","arrTime":"2008-01-16T03:09:00.000Z","uniqueCarrier":"WN","flightNumber":1488,"tailNumber":"N242WN","distance":344}
 ```
 
-### Database
-Log in to the database. Minikube will take you there by running:
-```bash
-minikube -n kca-demo service arangodb
-```
-
-Username is `root` and password is `password`.
-
-Open up Collections. You should see all of the records from the Kafka topic written into ArangoDB.
+### Validate
+Open up the `demo` database again and go to the collections we created earlier. You should now see that they have the data we just wrote into Kafka.
 
 ## Teardown
 Remove all manifests:
