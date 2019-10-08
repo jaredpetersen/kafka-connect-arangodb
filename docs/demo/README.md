@@ -51,7 +51,7 @@ Create a new database with the name `demo`. Switch to this new database and crea
 ### Create Kafka Topics
 Create an interactive ephemeral query pod:
 ```bash
-kubectl -n kca-demo run --generator=run-pod/v1 kafka-create-topics --image confluentinc/cp-kafka:5.3.1 -it --rm --command /bin/bash
+kubectl -n kca-demo run kafka-create-topics --generator=run-pod/v1 --image confluentinc/cp-kafka:5.3.1 -it --rm --command /bin/bash
 ```
 
 Create topics:
@@ -90,7 +90,7 @@ curl --request POST \
 ### Write Records
 Create an interactive ephemeral query pod:
 ```bash
-kubectl -n kca-demo run --generator=run-pod/v1 kafka-write-topics --image confluentinc/cp-kafka:5.3.1 -it --rm --command /bin/bash
+kubectl -n kca-demo run kafka-write-records --generator=run-pod/v1 --image confluentinc/cp-kafka:5.3.1 -it --rm --command /bin/bash
 ```
 
 Write records to the `airports` topic:
