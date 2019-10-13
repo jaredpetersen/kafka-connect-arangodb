@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Writer for writing Kafka Connect records to ArangoDB.
@@ -22,7 +23,6 @@ public class Writer {
    */
   public Writer(final ArangoDatabase database) {
     this.database = database;
-
   }
 
   /**
@@ -116,18 +116,16 @@ public class Writer {
    * @param records Records to delete
    */
   private void deleteBatch(final String collection, final List<ArangoRecord> records) {
-    final List<String> documentKeys = new ArrayList<>();
-
-    for (ArangoRecord record : records) {
-      documentKeys.add(record.getKey());
-    }
+    final List<String> documentKeys = records.stream()
+        .map(record -> record.getKey())
+        .collect(Collectors.toList());
 
     this.database.collection(collection).deleteDocuments(
         documentKeys,
         null,
         new DocumentDeleteOptions()
-          .waitForSync(true)
-          .silent(true));
+            .waitForSync(true)
+            .silent(true));
   }
 
   /**
@@ -136,17 +134,15 @@ public class Writer {
    * @param records Records to repsert
    */
   private void repsertBatch(final String collection, final List<ArangoRecord> records) {
-    final List<String> documentValues = new ArrayList<>();
-
-    for (ArangoRecord record : records) {
-      documentValues.add(record.getValue());
-    }
+    final List<String> documentValues = records.stream()
+        .map(record -> record.getValue())
+        .collect(Collectors.toList());
 
     this.database.collection(collection).insertDocuments(
         documentValues,
         new DocumentCreateOptions()
-          .overwrite(true)
-          .waitForSync(true)
-          .silent(true));
+            .overwrite(true)
+            .waitForSync(true)
+            .silent(true));
   }
 }

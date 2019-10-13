@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.kafka.connect.json.JsonConverter;
 import org.apache.kafka.connect.json.JsonConverterConfig;
 import org.apache.kafka.connect.json.JsonDeserializer;
@@ -71,12 +73,9 @@ public class ArangoDbSinkTask extends SinkTask {
     LOGGER.info("writing {} record(s)", records.size());
 
     // Convert sink records into something that can be written
-    final Collection<ArangoRecord> arangoRecords = new ArrayList<>();
-
-    for (final SinkRecord sinkRecord : records) {
-      final ArangoRecord arangoRecord = this.recordConverter.convert(sinkRecord);
-      arangoRecords.add(arangoRecord);
-    }
+    final Collection<ArangoRecord> arangoRecords = records.stream()
+        .map((sinkRecord) -> this.recordConverter.convert(sinkRecord))
+        .collect(Collectors.toList());
 
     // Write the ArangoDB records to the database
     this.writer.write(arangoRecords);

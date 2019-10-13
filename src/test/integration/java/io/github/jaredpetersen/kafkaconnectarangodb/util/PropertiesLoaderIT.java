@@ -1,11 +1,11 @@
 package io.github.jaredpetersen.kafkaconnectarangodb.util;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Properties;
 import org.junit.jupiter.api.Test;
 
-public class PropertiesLoaderTests {
+public class PropertiesLoaderIT {
   @Test
   public void constructorDoesNothing() {
     new PropertiesLoader();
@@ -14,7 +14,7 @@ public class PropertiesLoaderTests {
   @Test
   public void loadLoadsProperties() {
     final Properties properties = PropertiesLoader.load();
-
-    assertEquals("1.0.5", properties.get("version"));
+    final String version = (String) properties.get("version");
+    assertTrue(version.matches("[0-9]+\\.[0-9]+\\.[0-9]+"));
   }
 }

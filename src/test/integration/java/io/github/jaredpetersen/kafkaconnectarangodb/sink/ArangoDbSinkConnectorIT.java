@@ -1,6 +1,7 @@
 package io.github.jaredpetersen.kafkaconnectarangodb.sink;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.config.ArangoDbSinkConfig;
 import java.util.HashMap;
@@ -11,11 +12,11 @@ import org.apache.kafka.connect.connector.Task;
 import org.apache.kafka.connect.sink.SinkConnector;
 import org.junit.jupiter.api.Test;
 
-public class ArangoDbSinkConnectorTests {
+public class ArangoDbSinkConnectorIT {
   @Test
   public void versionReturnsVersion() {
     final SinkConnector connector = new ArangoDbSinkConnector();
-    assertEquals("1.0.5", connector.version());
+    assertTrue(connector.version().matches("[0-9]+\\.[0-9]+\\.[0-9]+"));
   }
 
   @Test

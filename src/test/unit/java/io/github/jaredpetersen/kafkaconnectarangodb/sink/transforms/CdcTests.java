@@ -13,16 +13,16 @@ import org.apache.kafka.connect.sink.SinkRecord;
 import org.junit.jupiter.api.Test;
 
 public class CdcTests {
-  private final Schema keyStructSchema = SchemaBuilder.struct()
+  private static final Schema keyStructSchema = SchemaBuilder.struct()
       .name("key").version(1).doc("key schema")
       .field("Id", Schema.INT32_SCHEMA)
       .build();
-  private final Schema valueStructDocumentSchema = SchemaBuilder.struct()
+  private static final Schema valueStructDocumentSchema = SchemaBuilder.struct()
       .name("valueDocument").version(1).doc("value document schema")
       .field("Name", Schema.STRING_SCHEMA)
       .optional()
       .build();
-  private final Schema valueStructSchema = SchemaBuilder.struct()
+  private static final Schema valueStructSchema = SchemaBuilder.struct()
       .name("value").version(1).doc("value schema")
       .field("before", valueStructDocumentSchema)
       .field("after", valueStructDocumentSchema)
