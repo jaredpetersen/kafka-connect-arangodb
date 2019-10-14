@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: kafka-connect
-        image: jaredpetersen/kafka-connect-arangodb:1.0.4
+        image: jaredpetersen/kafka-connect-arangodb:1.0.5
         imagePullPolicy: Never
         ports:
         - containerPort: 8083
