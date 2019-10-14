@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-public class ArangoRecordTests {
+public class ArangoRecordTest {
   @Test
   public void getCollectionReturnsCollection() {
     final ArangoRecord record = new ArangoRecord("somecollection", "somekey", "somevalue");

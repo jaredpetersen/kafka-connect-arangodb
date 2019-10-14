@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-public class WriterTests {
+public class WriterTest {
   @Test
   public void writeSingleCollectionRepsertWritesRecords() {
     // Set up input stubs

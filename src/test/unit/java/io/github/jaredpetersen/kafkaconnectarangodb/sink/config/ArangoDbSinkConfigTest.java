@@ -8,7 +8,7 @@ import java.util.Map;
 import org.apache.kafka.common.config.ConfigException;
 import org.junit.jupiter.api.Test;
 
-public class ArangoDbSinkConfigTests {
+public class ArangoDbSinkConfigTest {
   private Map<String, Object> buildConfigMap() {
     final Map<String, Object> originalsStub = new HashMap<String, Object>();
     originalsStub.put("arangodb.host", "127.0.0.1");

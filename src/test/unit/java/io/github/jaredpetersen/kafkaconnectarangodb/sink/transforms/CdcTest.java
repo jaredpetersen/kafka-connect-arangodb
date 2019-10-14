@@ -12,7 +12,7 @@ import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.junit.jupiter.api.Test;
 
-public class CdcTests {
+public class CdcTest {
   private static final Schema keyStructSchema = SchemaBuilder.struct()
       .name("key").version(1).doc("key schema")
       .field("Id", Schema.INT32_SCHEMA)

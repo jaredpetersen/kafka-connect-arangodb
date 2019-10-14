@@ -8,7 +8,7 @@ import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.ArangoRecord;
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.RecordConverter;
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.Writer;
 import io.github.jaredpetersen.kafkaconnectarangodb.util.PropertiesLoader;
-import java.util.ArrayList;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * Kafka Connect Task for Kafka Connect ArangoDb Sink.
  */
 public class ArangoDbSinkTask extends SinkTask {
-  private static final Logger LOGGER = LoggerFactory.getLogger(ArangoDbSinkTask.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ArangoDbSinkTask.class);
 
   private RecordConverter recordConverter;
   private Writer writer;
@@ -38,7 +38,7 @@ public class ArangoDbSinkTask extends SinkTask {
 
   @Override
   public final void start(final Map<String, String> props) {
-    LOGGER.info("task config: {}", props);
+    LOG.info("task config: {}", props);
 
     // Set up database
     final ArangoDbSinkConfig config = new ArangoDbSinkConfig(props);
@@ -70,7 +70,7 @@ public class ArangoDbSinkTask extends SinkTask {
       return;
     }
 
-    LOGGER.info("writing {} record(s)", records.size());
+    LOG.info("writing {} record(s)", records.size());
 
     // Convert sink records into something that can be written
     final Collection<ArangoRecord> arangoRecords = records.stream()

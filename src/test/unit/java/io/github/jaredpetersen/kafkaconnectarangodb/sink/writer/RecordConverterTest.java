@@ -18,7 +18,7 @@ import org.apache.kafka.connect.json.JsonDeserializer;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.junit.jupiter.api.Test;
 
-public class RecordConverterTests {
+public class RecordConverterTest {
   private final Schema keyStructSchema = SchemaBuilder.struct()
       .name("key").version(1).doc("key schema")
       .field("Id", Schema.INT32_SCHEMA)
