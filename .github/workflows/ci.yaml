@@ -1,4 +1,4 @@
-name: Java CI
+name: CI
 
 on: [push]
 
@@ -14,4 +14,4 @@ jobs:
       with:
         java-version: 11
     - name: Build
-      run: mvn -B package --file pom.xml
+      run: mvn package
