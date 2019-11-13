@@ -58,7 +58,7 @@
     <java.version>8</java.version>
     <kafka.version>2.1.0</kafka.version>
     <arangodb.version>5.0.4</arangodb.version>
-    <jackson.version>2.9.8</jackson.version>
+    <jackson.version>2.9.10.1</jackson.version>
     <junit.version>5.3.2</junit.version>
     <mockito.version>2.23.4</mockito.version>
   </properties>
