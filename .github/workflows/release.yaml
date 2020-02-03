@@ -68,15 +68,15 @@ jobs:
           asset_name: kafka-connect-arangodb-${{ steps.deploy.outputs.version }}.jar.asc
           asset_content_type: text/plain
       - name: Upload Release Asset -- POM
-          id: upload_release_asset_pom
-          uses: actions/upload-release-asset@v1.0.1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: target/kafka-connect-arangodb-${{ steps.deploy.outputs.version }}.pom
-            asset_name: kafka-connect-arangodb-${{ steps.deploy.outputs.version }}.pom
-            asset_content_type: text/xml
+        id: upload_release_asset_pom
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: target/kafka-connect-arangodb-${{ steps.deploy.outputs.version }}.pom
+          asset_name: kafka-connect-arangodb-${{ steps.deploy.outputs.version }}.pom
+          asset_content_type: text/xml
       - name: Upload Release Asset -- POM ASC
         id: upload_release_asset_pom_asc
         uses: actions/upload-release-asset@v1.0.1
