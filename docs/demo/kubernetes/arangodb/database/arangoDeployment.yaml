@@ -1,5 +1,4 @@
 apiVersion: database.arangodb.com/v1alpha
-apiVersion: database.arangodb.com/v1alpha
 kind: ArangoDeployment
 metadata:
   name: arangodb

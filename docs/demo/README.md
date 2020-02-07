@@ -13,9 +13,9 @@ minikube start --cpus 2 --memory 10g
 ### Docker
 Now that we have a cluster, we'll need a Docker image that contains the Kafka Connect ArangoDB plugin. We don't publish a Docker image to public Docker registries since you will usually install multiple Kafka Connect plugins on one image. Additionally, that base image may vary depending on your preferences and use case.
 
-Navigate to `/demo/docker` and run the following commands in a separate terminal to download the plugin and build the image:
+Navigate to `demo/docker/` and run the following commands in a separate terminal to download the plugin and build the image for Minikube:
 ```bash
-curl -O https://search.maven.org/remotecontent?filepath=io/github/jaredpetersen/kafka-connect-arangodb/1.0.5/kafka-connect-arangodb-1.0.4.jar
+curl -O https://search.maven.org/remotecontent?filepath=io/github/jaredpetersen/kafka-connect-arangodb/1.0.5/kafka-connect-arangodb-1.0.5.jar
 eval $(minikube docker-env)
 docker build -t jaredpetersen/kafka-connect-arangodb:1.0.5 .
 ```
@@ -36,6 +36,8 @@ Check in on the pods and wait for everything to come up:
 ```bash
 kubectl -n kca-demo get pods
 ```
+
+Be patient, this can take a few minutes.
 
 ## Usage
 ### Database

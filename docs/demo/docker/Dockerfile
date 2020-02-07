@@ -1,4 +1,3 @@
-ARG VERSION=5.3.1
+ARG VERSION=5.4.0
 FROM confluentinc/cp-kafka-connect-base:${VERSION}
-ENV CONNECT_PLUGIN_PATH = /etc/kafka-connect/jars
-COPY kafka-connect-arangodb-*.jar ${CONNECT_PLUGIN_PATH}/kafka-connect-arangodb/
+COPY kafka-connect-arangodb-*.jar /usr/share/java/kafka-connect-arangodb/
