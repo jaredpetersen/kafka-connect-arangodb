@@ -17,11 +17,6 @@ Only [@jaredpetersen](https://github.com/jaredpetersen) is able to deploy a new 
 8. Wait at least an hour and [confirm that the plugin has been updated](https://search.maven.org/search?q=g:io.github.jaredpetersen%20AND%20a:kafka-connect-arangodb&core=gav).
 
 ## Confluent Hub
-1. Pull the latest master branch of the repository.
-2. Package the plugin in Confluent Hub's archive format.
-    ```
-    mvn clean package
-    ```
-3. Send an email to [confluent-hub@confluent.io](mailto:confluent-hub@confluent.io?Subject=Kafka%20Connect%20ArangoDB%20Plugin%20--%20New%20Version%20Submission) attached with the compressed component archive located at `/target/components/packages`. If the component archive is too large, upload it to a cloud storage provider and provide the link.
-
-TODO: Save the Confluent Hub artifact as a GitHub Actions build artifact so that we can download it instead of building twice
+1. Find the latest GitHub Release and get the link to the Confluent Package (e.g. https://github.com/jaredpetersen/kafka-connect-arangodb/releases/download/1.X.X/jaredpetersen-kafka-connect-arangodb-1.X.X.zip).
+2. Send an email to [confluent-hub@confluent.io](mailto:confluent-hub@confluent.io?Subject=Kafka%20Connect%20ArangoDB%20Plugin%20--%20New%20Version%20Submission) with the link to the Confluent Package.
+3. Wait at least 48 hours for a confirmation that the package has been uploaded.
