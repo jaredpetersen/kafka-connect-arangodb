@@ -6,3 +6,4 @@
 .project
 target
 dependency-reduced-pom.xml
+*.jar

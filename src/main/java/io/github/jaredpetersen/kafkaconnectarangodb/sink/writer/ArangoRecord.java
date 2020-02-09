@@ -49,29 +49,21 @@ public class ArangoRecord {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null) {
-      return false;
-    }
-    if (o == this) {
+    if (this == o) {
       return true;
     }
-    if (!(o instanceof ArangoRecord)) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-
-    final ArangoRecord record = (ArangoRecord) o;
-    return Objects.equals(this.getCollection(), record.getCollection())
-      && Objects.equals(this.getKey(), record.getKey())
-      && Objects.equals(this.getValue(), record.getValue());
+    ArangoRecord that = (ArangoRecord) o;
+    return Objects.equals(getCollection(), that.getCollection())
+            && Objects.equals(getKey(), that.getKey())
+            && Objects.equals(getValue(), that.getValue());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(
-      this.getCollection(),
-      this.getKey(),
-      this.getValue()
-    );
+    return Objects.hash(getCollection(), getKey(), getValue());
   }
 
   @Override

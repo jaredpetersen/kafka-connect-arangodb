@@ -1,0 +1,11 @@
+apiVersion: database.arangodb.com/v1alpha
+kind: ArangoDeployment
+metadata:
+  name: arangodb
+spec:
+  mode: Cluster
+  image: arangodb/arangodb:3.4.7
+  externalAccess:
+    type: NodePort
+  tls:
+    caSecretName: None

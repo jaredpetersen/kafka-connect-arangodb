@@ -7,11 +7,13 @@ import io.github.jaredpetersen.kafkaconnectarangodb.sink.config.ArangoDbSinkConf
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.ArangoRecord;
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.RecordConverter;
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.Writer;
-import io.github.jaredpetersen.kafkaconnectarangodb.util.PropertiesLoader;
-import java.util.ArrayList;
+import io.github.jaredpetersen.kafkaconnectarangodb.util.VersionUtil;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.kafka.connect.json.JsonConverter;
 import org.apache.kafka.connect.json.JsonConverterConfig;
 import org.apache.kafka.connect.json.JsonDeserializer;
@@ -24,19 +26,19 @@ import org.slf4j.LoggerFactory;
  * Kafka Connect Task for Kafka Connect ArangoDb Sink.
  */
 public class ArangoDbSinkTask extends SinkTask {
-  private static final Logger LOGGER = LoggerFactory.getLogger(ArangoDbSinkTask.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ArangoDbSinkTask.class);
 
   private RecordConverter recordConverter;
   private Writer writer;
 
   @Override
   public final String version() {
-    return PropertiesLoader.load().getProperty("version");
+    return VersionUtil.getVersion();
   }
 
   @Override
   public final void start(final Map<String, String> props) {
-    LOGGER.info("task config: {}", props);
+    LOG.info("task config: {}", props);
 
     // Set up database
     final ArangoDbSinkConfig config = new ArangoDbSinkConfig(props);
@@ -68,15 +70,12 @@ public class ArangoDbSinkTask extends SinkTask {
       return;
     }
 
-    LOGGER.info("writing {} record(s)", records.size());
+    LOG.info("writing {} record(s)", records.size());
 
     // Convert sink records into something that can be written
-    final Collection<ArangoRecord> arangoRecords = new ArrayList<>();
-
-    for (final SinkRecord sinkRecord : records) {
-      final ArangoRecord arangoRecord = this.recordConverter.convert(sinkRecord);
-      arangoRecords.add(arangoRecord);
-    }
+    final Collection<ArangoRecord> arangoRecords = records.stream()
+        .map((sinkRecord) -> this.recordConverter.convert(sinkRecord))
+        .collect(Collectors.toList());
 
     // Write the ArangoDB records to the database
     this.writer.write(arangoRecords);
