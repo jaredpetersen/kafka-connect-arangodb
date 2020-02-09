@@ -5,16 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Properties;
 import org.junit.jupiter.api.Test;
 
-public class PropertiesLoaderIT {
+public class VersionUtilIT {
   @Test
   public void constructorDoesNothing() {
-    new PropertiesLoader();
+    new VersionUtil();
   }
 
   @Test
-  public void loadLoadsProperties() {
-    final Properties properties = PropertiesLoader.load();
-    final String version = (String) properties.get("version");
+  public void getVersionReturnsVersion() {
+    final String version = VersionUtil.getVersion();
     assertTrue(version.matches("[0-9]+\\.[0-9]+\\.[0-9]+"));
   }
 }

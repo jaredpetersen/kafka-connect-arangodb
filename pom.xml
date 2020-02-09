@@ -327,9 +327,8 @@
                     <tag>arangodb</tag>
                     <tag>arango</tag>
                     <tag>graph</tag>
+                    <tag>database</tag>
                     <tag>nosql</tag>
-                    <tag>multimodel</tag>
-                    <tag>json</tag>
                   </tags>
                 </configuration>
               </execution>

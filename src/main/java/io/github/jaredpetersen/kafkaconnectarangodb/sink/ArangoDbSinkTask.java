@@ -7,7 +7,7 @@ import io.github.jaredpetersen.kafkaconnectarangodb.sink.config.ArangoDbSinkConf
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.ArangoRecord;
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.RecordConverter;
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.Writer;
-import io.github.jaredpetersen.kafkaconnectarangodb.util.PropertiesLoader;
+import io.github.jaredpetersen.kafkaconnectarangodb.util.VersionUtil;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -33,7 +33,7 @@ public class ArangoDbSinkTask extends SinkTask {
 
   @Override
   public final String version() {
-    return PropertiesLoader.load().getProperty("version");
+    return VersionUtil.getVersion();
   }
 
   @Override

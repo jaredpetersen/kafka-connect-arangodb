@@ -1,7 +1,7 @@
 package io.github.jaredpetersen.kafkaconnectarangodb.sink;
 
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.config.ArangoDbSinkConfig;
-import io.github.jaredpetersen.kafkaconnectarangodb.util.PropertiesLoader;
+import io.github.jaredpetersen.kafkaconnectarangodb.util.VersionUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +17,7 @@ public class ArangoDbSinkConnector extends SinkConnector {
 
   @Override
   public final String version() {
-    return PropertiesLoader.load().getProperty("version");
+    return VersionUtil.getVersion();
   }
 
   @Override
