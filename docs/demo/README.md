@@ -46,7 +46,7 @@ Log in to the database. Minikube will take you there by running:
 minikube -n kca-demo service arangodb-ea
 ```
 
-The username is `root` and the password is blank.
+The username is `root` and the password is empty.
 
 Create a new database with the name `demo`. Switch to this new database and create a document collection with the name `airports` and an edge collection with the name `flights`.
 
