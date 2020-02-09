@@ -15,9 +15,9 @@ Now that we have a cluster, we'll need a Docker image that contains the Kafka Co
 
 Navigate to `demo/docker/` and run the following commands in a separate terminal to download the plugin and build the image for Minikube:
 ```bash
-curl -O https://search.maven.org/remotecontent?filepath=io/github/jaredpetersen/kafka-connect-arangodb/1.0.5/kafka-connect-arangodb-1.0.5.jar
+curl -O https://search.maven.org/remotecontent?filepath=io/github/jaredpetersen/kafka-connect-arangodb/1.0.6/kafka-connect-arangodb-1.0.6.jar
 eval $(minikube docker-env)
-docker build -t jaredpetersen/kafka-connect-arangodb:1.0.5 .
+docker build -t jaredpetersen/kafka-connect-arangodb:1.0.6 .
 ```
 
 Close out this terminal when you're done -- we want to go back to our normal Docker environment.
@@ -53,7 +53,7 @@ Create a new database with the name `demo`. Switch to this new database and crea
 ### Create Kafka Topics
 Create an interactive ephemeral query pod:
 ```bash
-kubectl -n kca-demo run kafka-create-topics --generator=run-pod/v1 --image confluentinc/cp-kafka:5.3.1 -it --rm --command /bin/bash
+kubectl -n kca-demo run kafka-create-topics --generator=run-pod/v1 --image confluentinc/cp-kafka:5.4.0 -it --rm --command /bin/bash
 ```
 
 Create topics:
@@ -63,16 +63,10 @@ kafka-topics --create --zookeeper zookeeper-0.zookeeper:2181 --replication-facto
 ```
 
 ### Configure Kafka Connect ArangoDB
-Get the host information for Kafka connect and the database:
-```
-minikube -n kca-demo service kafka-connect --url
-minikube -n kca-demo service arangodb-ea --url
-```
-
-Send a request to the Kafka Connect REST API to configure it to use Kafka Connect ArangoDB, replacing `KAFKA-CONNECT-HOST`, `KAFKA-CONNECT-PORT`, `ARANGODB-HOST`, and `ARANGODB-PORT` with the appropriate values from the previous commands:
+Send a request to the Kafka Connect REST API to configure it to use Kafka Connect ArangoDB:
 ```bash
 curl --request POST \
-    --url "KAFKA-CONNECT-HOST:KAFKA-CONNECT-PORT/connectors" \
+    --url "$(minikube -n kca-demo service kafka-connect --url)/connectors" \
     --header 'content-type: application/json' \
     --data '{
         "name": "demo-arangodb-connector",
@@ -80,8 +74,8 @@ curl --request POST \
             "connector.class": "io.github.jaredpetersen.kafkaconnectarangodb.sink.ArangoDbSinkConnector",
             "tasks.max": "1",
             "topics": "stream.airports,stream.flights",
-            "arangodb.host": "ARANGODB-HOST",
-            "arangodb.port": ARANGODB-PORT,
+            "arangodb.host": "arangodb-ea",
+            "arangodb.port": 8529,
             "arangodb.user": "root",
             "arangodb.password": "",
             "arangodb.database.name": "demo"
@@ -92,7 +86,7 @@ curl --request POST \
 ### Write Records
 Create an interactive ephemeral query pod:
 ```bash
-kubectl -n kca-demo run kafka-write-records --generator=run-pod/v1 --image confluentinc/cp-kafka:5.3.1 -it --rm --command /bin/bash
+kubectl -n kca-demo run kafka-write-records --generator=run-pod/v1 --image confluentinc/cp-kafka:5.4.0 -it --rm --command /bin/bash
 ```
 
 Write records to the `airports` topic:

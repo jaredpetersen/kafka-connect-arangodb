@@ -56,9 +56,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>8</java.version>
-    <kafka.version>2.3.0</kafka.version>
+    <kafka.version>2.4.0</kafka.version>
     <arangodb.version>6.3.0</arangodb.version>
-    <jackson.version>2.10.0</jackson.version>
     <slf4j.version>1.7.28</slf4j.version>
     <junit.version>5.5.2</junit.version>
     <mockito.version>3.1.0</mockito.version>
@@ -77,12 +76,6 @@
       <artifactId>connect-json</artifactId>
       <version>${kafka.version}</version>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${jackson.version}</version>
     </dependency>
 
     <dependency>
