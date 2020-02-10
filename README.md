@@ -11,6 +11,13 @@ Requires ArangoDB 3.4 or higher.
 
 A full example of how Kafka Connect ArangoDB can be integrated into a Kafka cluster is available in the [development documentation](/docs/development/).
 
+### Topics
+The name of the topic determines the name of the ArangoDB collection the record will be written to.
+
+Record with topics that are just a plain string like `products` will go into a collection with the name `products`. If the record's topic name is period-separated like `dbserver1.mydatabase.customers`, the last period-separated value will be the collection's name (`customers` in this case). Each configured Kafka Connect ArangoDB Connector will only output data into a single database instance.
+
+Please note that the connector will *NOT* create ArangoDB collections for you and will exit if the collection does not exist. As such, do not configure the connector to listen to topics that do not have a corresponding collection.
+
 ### Record Formats and Structures
 The following record formats are supported:
 * Avro (Recommended)
@@ -68,11 +75,6 @@ To use this record format, configure it as a Kafka Connect Single Message Transf
   "transforms.cdc.type": "io.github.jaredpetersen.kafkaconnectarangodb.sink.transforms.Cdc"
 }
 ```
-
-### Topics
-The name of the topic determines the name of the collection the record will be written to.
-
-Record with topics that are just a plain string like `products` will go into a collection with the name `products`. If the record's topic name is period-separated like `dbserver1.mydatabase.customers`, the last period-separated value will be the collection's name (`customers` in this case). Each configured Kafka Connect ArangoDB Connector will only output data into a single database instance.
 
 ### Foreign Keys and Edge Collections
 In most situations, the record values that you will want to sink into ArangoDB is not in a format that ArangoDB can use effectively. ArangoDB has it's own format for foreign keys (`{ "foreignKey": "MyCollection/1234" }`) and edges between vertices (`{ "_from": "MyCollection/1234", "_to": "MyCollection/5678" }`) that your input data likely doesn't implement by default. It is recommended that you build your own custom [Kafka Streams application](https://kafka.apache.org/documentation/streams/) to perform these mappings.
