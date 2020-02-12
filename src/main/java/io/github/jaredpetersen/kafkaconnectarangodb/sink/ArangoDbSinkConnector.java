@@ -16,11 +16,6 @@ public class ArangoDbSinkConnector extends SinkConnector {
   private Map<String, String> config;
 
   @Override
-  public final String version() {
-    return VersionUtil.getVersion();
-  }
-
-  @Override
   public final void start(final Map<String, String> props) {
     this.config = props;
   }
@@ -49,5 +44,10 @@ public class ArangoDbSinkConnector extends SinkConnector {
   @Override
   public final ConfigDef config() {
     return ArangoDbSinkConfig.CONFIG_DEF;
+  }
+
+  @Override
+  public final String version() {
+    return VersionUtil.getVersion();
   }
 }

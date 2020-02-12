@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 public class ArangoDbSinkTask extends SinkTask {
   private static final Logger LOG = LoggerFactory.getLogger(ArangoDbSinkTask.class);
 
+  private ArangoDB arangoDb;
   private RecordConverter recordConverter;
   private Writer writer;
 
@@ -42,12 +43,12 @@ public class ArangoDbSinkTask extends SinkTask {
 
     // Set up database
     final ArangoDbSinkConfig config = new ArangoDbSinkConfig(props);
-    final ArangoDB arangodb = new ArangoDB.Builder()
+    this.arangoDb = new ArangoDB.Builder()
         .host(config.arangoDbHost, config.arangoDbPort)
         .user(config.arangoDbUser)
         .password(config.arangoDbPassword.value())
         .build();
-    final ArangoDatabase database = arangodb.db(config.arangoDbDatabaseName);
+    final ArangoDatabase database = this.arangoDb.db(config.arangoDbDatabaseName);
 
     // Set up the record converter
     final JsonConverter jsonConverter = new JsonConverter();
@@ -83,6 +84,6 @@ public class ArangoDbSinkTask extends SinkTask {
 
   @Override
   public final void stop() {
-    // Do nothing
+    this.arangoDb.shutdown();
   }
 }

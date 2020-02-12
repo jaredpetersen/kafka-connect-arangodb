@@ -9,3 +9,5 @@ spec:
     type: NodePort
   tls:
     caSecretName: None
+  auth:
+    jwtSecretName: jwt-secret

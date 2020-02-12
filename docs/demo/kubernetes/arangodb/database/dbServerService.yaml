@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: arangodb-prmr
+spec:
+  # Headless service that gives us access to all of the ArangoDB DBServers
+  selector:
+    arango_deployment: arangodb
+    role: dbserver
+  clusterIP: None
+
