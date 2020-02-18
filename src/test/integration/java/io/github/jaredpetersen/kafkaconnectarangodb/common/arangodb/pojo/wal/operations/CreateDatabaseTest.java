@@ -2,7 +2,6 @@ package io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.op
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.Type;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.WalEntry;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +42,6 @@ public class CreateDatabaseTest {
         .build();
     final WalEntry entry = new CreateDatabase.Builder()
         .tick("2103")
-        .type(Type.CREATE_DATABASE.toValue())
         .db("test")
         .data(data)
         .build();

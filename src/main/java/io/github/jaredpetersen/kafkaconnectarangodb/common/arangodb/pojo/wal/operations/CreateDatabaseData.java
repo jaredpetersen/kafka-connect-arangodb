@@ -3,6 +3,8 @@ package io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.op
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
+import java.util.Objects;
+
 @JsonDeserialize(builder = CreateDatabaseData.Builder.class)
 public class CreateDatabaseData {
   private final Long database;
@@ -25,6 +27,21 @@ public class CreateDatabaseData {
 
   public String getName() {
     return name;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    CreateDatabaseData that = (CreateDatabaseData) o;
+    return Objects.equals(getDatabase(), that.getDatabase()) &&
+        Objects.equals(getId(), that.getId()) &&
+        Objects.equals(getName(), that.getName());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(getDatabase(), getId(), getName());
   }
 
   @JsonPOJOBuilder(withPrefix = "")

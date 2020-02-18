@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 public interface WalEntry {
   String getTick();
 
-  Integer getType();
+  int getType();
 
   String getDb();
 }

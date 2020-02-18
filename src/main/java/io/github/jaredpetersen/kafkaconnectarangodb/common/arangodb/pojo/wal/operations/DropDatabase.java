@@ -1,18 +1,19 @@
 package io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.operations;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.Type;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.WalEntry;
 
 @JsonDeserialize(as = DropDatabase.class, builder = DropDatabase.Builder.class)
 public class DropDatabase implements WalEntry {
   private final String tick;
-  private final Integer type;
+  private final int type = Type.DROP_DATABASE.toValue();
   private final String db;
 
   private DropDatabase(DropDatabase.Builder builder) {
     this.tick = builder.tick;
-    this.type = builder.type;
     this.db = builder.db;
   }
 
@@ -20,7 +21,7 @@ public class DropDatabase implements WalEntry {
     return this.tick;
   }
 
-  public final Integer getType() {
+  public final int getType() {
     return this.type;
   }
 
@@ -29,6 +30,7 @@ public class DropDatabase implements WalEntry {
   }
 
   @JsonPOJOBuilder(withPrefix = "")
+  @JsonIgnoreProperties(value = { "type" })
   public static class Builder {
     private String tick;
     private Integer type = 0;
@@ -36,11 +38,6 @@ public class DropDatabase implements WalEntry {
 
     public DropDatabase.Builder tick(String tick) {
       this.tick = tick;
-      return this;
-    }
-
-    public DropDatabase.Builder type(Integer type) {
-      this.type = type;
       return this;
     }
 
