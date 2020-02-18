@@ -7,15 +7,17 @@ import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.Typ
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.WalEntry;
 import java.util.Objects;
 
-@JsonDeserialize(as = DropDatabase.class, builder = DropDatabase.Builder.class)
-public class DropDatabase implements WalEntry {
+@JsonDeserialize(as = DropCollection.class, builder = DropCollection.Builder.class)
+public class DropCollection implements WalEntry {
   private final String tick;
-  private final int type = Type.DROP_DATABASE.toValue();
+  private final int type = Type.DROP_COLLECTION.toValue();
   private final String db;
+  private final String cuid;
 
-  private DropDatabase(DropDatabase.Builder builder) {
+  private DropCollection(DropCollection.Builder builder) {
     this.tick = builder.tick;
     this.db = builder.db;
+    this.cuid = builder.cuid;
   }
 
   public final String getTick() {
@@ -30,19 +32,24 @@ public class DropDatabase implements WalEntry {
     return this.db;
   }
 
+  public String getCuid() {
+    return this.cuid;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    DropDatabase that = (DropDatabase) o;
+    DropCollection that = (DropCollection) o;
     return getType() == that.getType() &&
         Objects.equals(getTick(), that.getTick()) &&
-        Objects.equals(getDb(), that.getDb());
+        Objects.equals(getDb(), that.getDb()) &&
+        Objects.equals(getCuid(), that.getCuid());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getTick(), getType(), getDb());
+    return Objects.hash(getTick(), getType(), getDb(), getCuid());
   }
 
   @JsonPOJOBuilder(withPrefix = "")
@@ -50,19 +57,25 @@ public class DropDatabase implements WalEntry {
   public static class Builder {
     private String tick;
     private String db;
+    private String cuid;
 
-    public DropDatabase.Builder tick(String tick) {
+    public DropCollection.Builder tick(String tick) {
       this.tick = tick;
       return this;
     }
 
-    public DropDatabase.Builder db(String db) {
+    public DropCollection.Builder db(String db) {
       this.db = db;
       return this;
     }
 
-    public DropDatabase build() {
-      return new DropDatabase(this);
+    public DropCollection.Builder cuid(String cuid) {
+      this.cuid = cuid;
+      return this;
+    }
+
+    public DropCollection build() {
+      return new DropCollection(this);
     }
   }
 }
