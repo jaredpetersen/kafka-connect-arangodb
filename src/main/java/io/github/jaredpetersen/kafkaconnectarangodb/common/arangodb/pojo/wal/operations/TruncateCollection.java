@@ -4,97 +4,78 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.Type;
-
+import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.WalEntry;
 import java.util.Objects;
 
-@JsonDeserialize(as = ChangeCollection.class, builder = ChangeCollection.Builder.class)
-public class ChangeCollection {
+@JsonDeserialize(as = TruncateCollection.class, builder = TruncateCollection.Builder.class)
+public class TruncateCollection implements WalEntry {
   private final String tick;
-  private final int type = Type.CHANGE_COLLECTION.toValue();
+  private final int type = Type.TRUNCATE_COLLECTION.toValue();
   private final String db;
   private final String cuid;
-  private final ChangeCollectionData data;
 
-  private ChangeCollection(ChangeCollection.Builder builder) {
+  private TruncateCollection(TruncateCollection.Builder builder) {
     this.tick = builder.tick;
     this.db = builder.db;
     this.cuid = builder.cuid;
-    this.data = builder.data;
   }
 
-  public String getTick() {
-    return tick;
+  public final String getTick() {
+    return this.tick;
   }
 
-  public int getType() {
-    return type;
+  public final int getType() {
+    return this.type;
   }
 
-  public String getDb() {
-    return db;
+  public final String getDb() {
+    return this.db;
   }
 
   public String getCuid() {
-    return cuid;
-  }
-
-  public ChangeCollectionData getData() {
-    return data;
+    return this.cuid;
   }
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    ChangeCollection that = (ChangeCollection) o;
+    TruncateCollection that = (TruncateCollection) o;
     return getType() == that.getType() &&
         Objects.equals(getTick(), that.getTick()) &&
         Objects.equals(getDb(), that.getDb()) &&
-        Objects.equals(getCuid(), that.getCuid()) &&
-        Objects.equals(getData(), that.getData());
+        Objects.equals(getCuid(), that.getCuid());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getTick(), getType(), getDb(), getCuid(), getData());
+    return Objects.hash(getTick(), getType(), getDb(), getCuid());
   }
 
   @JsonPOJOBuilder(withPrefix = "")
   @JsonIgnoreProperties(value = { "type" })
   public static class Builder {
     private String tick;
-    private int type = Type.CHANGE_COLLECTION.toValue();
     private String db;
     private String cuid;
-    private ChangeCollectionData data;
 
-    public Builder tick(String tick) {
+    public TruncateCollection.Builder tick(String tick) {
       this.tick = tick;
       return this;
     }
 
-    public Builder type(int type) {
-      this.type = type;
-      return this;
-    }
-
-    public Builder db(String db) {
+    public TruncateCollection.Builder db(String db) {
       this.db = db;
       return this;
     }
 
-    public Builder cuid(String cuid) {
+    public TruncateCollection.Builder cuid(String cuid) {
       this.cuid = cuid;
       return this;
     }
 
-    public Builder data(ChangeCollectionData data) {
-      this.data = data;
-      return this;
-    }
-
-    public ChangeCollection build() {
-      return new ChangeCollection(this);
+    public TruncateCollection build() {
+      return new TruncateCollection(this);
     }
   }
 }

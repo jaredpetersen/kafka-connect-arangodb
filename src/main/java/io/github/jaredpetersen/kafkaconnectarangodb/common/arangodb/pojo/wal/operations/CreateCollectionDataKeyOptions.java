@@ -2,8 +2,7 @@ package io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.op
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-
-import java.util.List;
+import java.util.Objects;
 
 @JsonDeserialize(builder = CreateCollectionDataKeyOptions.Builder.class)
 public class CreateCollectionDataKeyOptions {
@@ -17,7 +16,7 @@ public class CreateCollectionDataKeyOptions {
     this.type = builder.type;
   }
 
-  public boolean isAllowUserKeys() {
+  public boolean getAllowUserKeys() {
     return this.allowUserKeys;
   }
 
@@ -27,6 +26,21 @@ public class CreateCollectionDataKeyOptions {
 
   public String getType() {
     return this.type;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    CreateCollectionDataKeyOptions that = (CreateCollectionDataKeyOptions) o;
+    return getAllowUserKeys() == that.getAllowUserKeys() &&
+        getLastValue() == that.getLastValue() &&
+        Objects.equals(getType(), that.getType());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(getAllowUserKeys(), getLastValue(), getType());
   }
 
   @JsonPOJOBuilder(withPrefix = "")

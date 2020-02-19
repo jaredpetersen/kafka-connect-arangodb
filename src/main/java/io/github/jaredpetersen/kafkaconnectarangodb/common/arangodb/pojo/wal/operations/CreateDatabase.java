@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.Type;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.WalEntry;
-
 import java.util.Objects;
 
 @JsonDeserialize(as = CreateDatabase.class, builder = CreateDatabase.Builder.class)
