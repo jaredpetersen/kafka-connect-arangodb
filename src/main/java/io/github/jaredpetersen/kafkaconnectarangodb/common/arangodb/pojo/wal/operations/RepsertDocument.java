@@ -3,99 +3,102 @@ package io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.op
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.Type;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.WalEntry;
-
 import java.util.Objects;
 
-@JsonDeserialize(as = ChangeCollection.class, builder = ChangeCollection.Builder.class)
-public class ChangeCollection implements WalEntry {
+@JsonDeserialize(as = RepsertDocument.class, builder = RepsertDocument.Builder.class)
+public class RepsertDocument implements WalEntry {
   private final String tick;
-  private final int type = Type.CHANGE_COLLECTION.toValue();
+  private final int type = Type.REPSERT_DOCUMENT.toValue();
   private final String db;
+  private final String tid;
   private final String cuid;
-  private final ChangeCollectionData data;
+  private final ObjectNode data;
 
-  private ChangeCollection(ChangeCollection.Builder builder) {
+  private RepsertDocument(RepsertDocument.Builder builder) {
     this.tick = builder.tick;
     this.db = builder.db;
+    this.tid = builder.tid;
     this.cuid = builder.cuid;
     this.data = builder.data;
   }
 
-  public String getTick() {
-    return tick;
+  public final String getTick() {
+    return this.tick;
   }
 
-  public int getType() {
-    return type;
+  public final int getType() {
+    return this.type;
   }
 
-  public String getDb() {
-    return db;
+  public final String getDb() {
+    return this.db;
   }
 
-  public String getCuid() {
-    return cuid;
+  public final String getTid() {
+    return this.tid;
   }
 
-  public ChangeCollectionData getData() {
-    return data;
+  public final ObjectNode getData() {
+    return this.data;
   }
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    ChangeCollection that = (ChangeCollection) o;
+    RepsertDocument that = (RepsertDocument) o;
     return getType() == that.getType() &&
         Objects.equals(getTick(), that.getTick()) &&
         Objects.equals(getDb(), that.getDb()) &&
-        Objects.equals(getCuid(), that.getCuid()) &&
+        Objects.equals(getTid(), that.getTid()) &&
+        Objects.equals(cuid, that.cuid) &&
         Objects.equals(getData(), that.getData());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getTick(), getType(), getDb(), getCuid(), getData());
+    return Objects.hash(getTick(), getType(), getDb(), getTid(), cuid, getData());
   }
 
   @JsonPOJOBuilder(withPrefix = "")
   @JsonIgnoreProperties(value = { "type" })
   public static class Builder {
     private String tick;
-    private int type = Type.CHANGE_COLLECTION.toValue();
     private String db;
+    private String tid;
     private String cuid;
-    private ChangeCollectionData data;
+    private ObjectNode data;
 
-    public Builder tick(String tick) {
+    public RepsertDocument.Builder tick(String tick) {
       this.tick = tick;
       return this;
     }
 
-    public Builder type(int type) {
-      this.type = type;
-      return this;
-    }
-
-    public Builder db(String db) {
+    public RepsertDocument.Builder db(String db) {
       this.db = db;
       return this;
     }
 
-    public Builder cuid(String cuid) {
+    public RepsertDocument.Builder tid(String tid) {
+      this.tid = tid;
+      return this;
+    }
+
+    public RepsertDocument.Builder cuid(String cuid) {
       this.cuid = cuid;
       return this;
     }
 
-    public Builder data(ChangeCollectionData data) {
+    public RepsertDocument.Builder data(ObjectNode data) {
       this.data = data;
       return this;
     }
 
-    public ChangeCollection build() {
-      return new ChangeCollection(this);
+    public RepsertDocument build() {
+      return new RepsertDocument(this);
     }
   }
 }

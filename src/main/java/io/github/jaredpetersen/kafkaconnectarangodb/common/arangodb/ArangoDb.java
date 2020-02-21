@@ -55,10 +55,13 @@ public class ArangoDb {
     }
   }
 
-  public List<WalEntry> tailWal() throws IOException {
-    return tailWal(null, null);
-  }
-
+  /**
+   * Tail the write-ahead log and return all operations.
+   * @param from Lower bound tick value for results.
+   * @param chunkSize Approximate maximum size of the returned result.
+   * @return All write-ahead log operations.
+   * @throws IOException
+   */
   public List<WalEntry> tailWal(Long from, Long chunkSize) throws IOException {
     HttpUrl.Builder urlBuilder = new HttpUrl.Builder()
         .scheme("http")
