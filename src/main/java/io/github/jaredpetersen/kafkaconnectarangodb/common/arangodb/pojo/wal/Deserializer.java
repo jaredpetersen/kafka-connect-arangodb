@@ -11,59 +11,40 @@ import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.ope
 import java.io.IOException;
 
 class Deserializer extends JsonDeserializer<WalEntry> {
+  private static final int START_TRANSACTION_CODE = 2200;
+  private static final int COMMIT_TRANSACTION_CODE = 2201;
+  private static final int ABORT_TRANSACTION_CODE = 2202;
+  private static final int REPSERT_DOCUMENT_CODE = 2300;
+  private static final int REMOVE_DOCUMENT_CODE = 2302;
+
   @Override
   public WalEntry deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
     final JsonNode node = jsonParser.getCodec().readTree(jsonParser);
-    final Type typeEnum = Type.valueOf(node.get("type").intValue());
+    final int type = node.get("type").intValue();
 
     final ObjectMapper mapper = (ObjectMapper) jsonParser.getCodec();
 
     WalEntry entry;
 
-    switch(typeEnum) {
-      case CREATE_DATABASE:
-        entry = mapper.readValue(node.toString(), CreateDatabase.class);
-        break;
-      case DROP_DATABASE:
-        entry = mapper.readValue(node.toString(), DropDatabase.class);
-        break;
-      case CREATE_COLLECTION:
-        entry = mapper.readValue(node.toString(), CreateCollection.class);
-        break;
-      case DROP_COLLECTION:
-        entry = mapper.readValue(node.toString(), DropCollection.class);
-        break;
-      case RENAME_COLLECTION:
-        entry = mapper.readValue(node.toString(), RenameCollection.class);
-        break;
-      case CHANGE_COLLECTION:
-        entry = mapper.readValue(node.toString(), ChangeCollection.class);
-        break;
-      case TRUNCATE_COLLECTION:
-        entry = mapper.readValue(node.toString(), TruncateCollection.class);
-        break;
-      // TODO Create index
-      // TODO Drop index
-      // TODO Create view
-      // TODO Drop view
-      // TODO Change view
-      case START_TRANSACTION:
+    switch(type) {
+      case START_TRANSACTION_CODE:
         entry = mapper.readValue(node.toString(), StartTransaction.class);
         break;
-      case COMMIT_TRANSACTION:
+      case COMMIT_TRANSACTION_CODE:
         entry = mapper.readValue(node.toString(), CommitTransaction.class);
         break;
-      case ABORT_TRANSACTION:
+      case ABORT_TRANSACTION_CODE:
         entry = mapper.readValue(node.toString(), AbortTransaction.class);
         break;
-      case REPSERT_DOCUMENT:
+      case REPSERT_DOCUMENT_CODE:
         entry = mapper.readValue(node.toString(), RepsertDocument.class);
         break;
-      case REMOVE_DOCUMENT:
+      case REMOVE_DOCUMENT_CODE:
         entry = mapper.readValue(node.toString(), RemoveDocument.class);
         break;
       default:
-        entry = null;
+        // Default
+        entry = mapper.readValue(node.toString(), Operation.class);
     }
 
     return entry;
