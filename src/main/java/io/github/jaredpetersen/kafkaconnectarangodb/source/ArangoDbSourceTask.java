@@ -1,30 +1,27 @@
 package io.github.jaredpetersen.kafkaconnectarangodb.source;
 
-import com.arangodb.ArangoDB;
-import com.arangodb.ArangoDatabase;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.ArangoDb;
+import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.WalEntry;
+import io.github.jaredpetersen.kafkaconnectarangodb.common.util.VersionUtil;
+import io.github.jaredpetersen.kafkaconnectarangodb.sink.config.ArangoDbSinkConfig;
 import io.github.jaredpetersen.kafkaconnectarangodb.source.config.ArangoDbSourceConfig;
-import io.github.jaredpetersen.kafkaconnectarangodb.util.VersionUtil;
-import org.apache.kafka.connect.json.JsonConverter;
-import org.apache.kafka.connect.json.JsonConverterConfig;
-import org.apache.kafka.connect.json.JsonDeserializer;
-import org.apache.kafka.connect.sink.SinkRecord;
-import org.apache.kafka.connect.sink.SinkTask;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Kafka Connect Task for Kafka Connect ArangoDb Source.
  */
 public class ArangoDbSourceTask extends SourceTask {
+  private static final Logger LOG = LoggerFactory.getLogger(ArangoDbSourceTask.class);
+
+  private ArangoDb arangoDb;
+  private Long lastTick = null;
 
   @Override
   public String version() {
@@ -32,13 +29,33 @@ public class ArangoDbSourceTask extends SourceTask {
   }
 
   @Override
-  public void start(Map<String, String> map) {
+  public void start(Map<String, String> props) {
+    LOG.info("task config: {}", props);
 
+    // TODO create a task config separate from connector config -- task may have to hit multiple db servers
+
+    // Set up database
+    final ArangoDbSourceConfig config = new ArangoDbSourceConfig(props);
+    this.arangoDb = new ArangoDb.Builder()
+        .host(config.getString(ArangoDbSinkConfig.DB_HOST))
+        .port(config.getInt(ArangoDbSinkConfig.ARANGODB_PORT))
+        .jwt(config.get.arangoDbJwt.value())
+        .build();
   }
 
   @Override
   public List<SourceRecord> poll() throws InterruptedException {
-    // TODO hit
+    LOG.info("reading record(s)");
+
+    try {
+      List<WalEntry> walEntries = this.arangoDb.tailWal(lastTick);
+      LOG.info("result: {}", walEntries);
+
+      String lastTick = walEntries.get(walEntries.size() - 1).getTick();
+      this.lastTick = Long.parseLong(lastTick);
+    } catch (IOException exception) {
+      LOG.error("failed to tail WAL", exception);
+    }
 
     return null;
   }

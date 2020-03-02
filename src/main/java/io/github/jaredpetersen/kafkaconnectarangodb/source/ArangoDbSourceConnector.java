@@ -1,28 +1,36 @@
 package io.github.jaredpetersen.kafkaconnectarangodb.source;
 
 import io.github.jaredpetersen.kafkaconnectarangodb.source.config.ArangoDbSourceConfig;
-import io.github.jaredpetersen.kafkaconnectarangodb.util.VersionUtil;
+import io.github.jaredpetersen.kafkaconnectarangodb.common.util.VersionUtil;
+import io.github.jaredpetersen.kafkaconnectarangodb.source.config.ArangoDbSourceTaskConfig;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.Task;
 import org.apache.kafka.connect.source.SourceConnector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * Entry point for Kafka Connect ArangoDB Source.
  */
 public class ArangoDbSourceConnector extends SourceConnector {
-  private Map<String, String> config;
+  private ArangoDbSourceConfig config;
+  private DatabaseHostMonitorThread databaseHostMonitor = null;
 
+  private static final Logger LOG = LoggerFactory.getLogger(ArangoDbSourceConnector.class);
 
   @Override
   public void start(Map<String, String> props) {
-    this.config = props;
+    this.config = new ArangoDbSourceConfig(props);
 
-    // TODO monitor headless service and request reconfigure anytime the hosts change
-//    this.reconfigure();
+    // Start a database monitoring thread to keep track of IP addresses
+    // This allows us to be flexible as the database scales up / down
+    long pollInterval = 30000;
+    this.databaseHostMonitor = new DatabaseHostMonitorThread(this.context, pollInterval, this.config.getConnectionUrl());
+    this.databaseHostMonitor.start();
   }
 
   @Override
@@ -32,10 +40,27 @@ public class ArangoDbSourceConnector extends SourceConnector {
 
   @Override
   public List<Map<String, String>> taskConfigs(final int maxTasks) {
-    List<Map<String, String>> taskConfigs = new ArrayList<>(maxTasks);
+    // Get db server addresses from the monitoring thread
+    final Set<String> databaseAddresses = this.databaseHostMonitor.getDatabaseAddresses();
 
-    for (int configIndex = 0; configIndex < maxTasks; ++configIndex) {
-      taskConfigs.add(this.config);
+    // Split the database addresses into batches that can be distributed amongst the sink tasks
+    final int taskCount = Math.min(maxTasks, databaseAddresses.size());
+    final int batchSize = (int) Math.ceil((double) databaseAddresses.size() / taskCount);
+    final AtomicInteger counter = new AtomicInteger();
+    final List<List<String>> databaseAddressBatches = new ArrayList<>(databaseAddresses
+        .stream()
+        .collect(Collectors.groupingBy(address -> counter.incrementAndGet() / batchSize))
+        .values());
+
+    final List<Map<String, String>> taskConfigs = new ArrayList<>(taskCount);
+
+    for (int i = 0; i < taskCount; ++i) {
+      Map<String, String> taskConfig = new HashMap<>();
+      taskConfig.put(ArangoDbSourceTaskConfig.CONNECTION_URL, String.join(",", databaseAddressBatches.get(i)));
+      taskConfig.put(ArangoDbSourceTaskConfig.CONNECTION_JWT, this.config.getConnectionJwt().value());
+      taskConfig.put(ArangoDbSourceTaskConfig.DB_NAME, String.join(",", this.config.getDatabaseNames()));
+
+      taskConfigs.add(taskConfig);
     }
 
     return taskConfigs;
@@ -43,7 +68,8 @@ public class ArangoDbSourceConnector extends SourceConnector {
 
   @Override
   public void stop() {
-    // Do nothing
+    this.databaseHostMonitor.shutdown();
+    this.databaseHostMonitor = null;
   }
 
   @Override

@@ -7,13 +7,11 @@ import io.github.jaredpetersen.kafkaconnectarangodb.sink.config.ArangoDbSinkConf
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.ArangoRecord;
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.RecordConverter;
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.Writer;
-import io.github.jaredpetersen.kafkaconnectarangodb.util.VersionUtil;
-
+import io.github.jaredpetersen.kafkaconnectarangodb.common.util.VersionUtil;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.apache.kafka.connect.json.JsonConverter;
 import org.apache.kafka.connect.json.JsonConverterConfig;
 import org.apache.kafka.connect.json.JsonDeserializer;

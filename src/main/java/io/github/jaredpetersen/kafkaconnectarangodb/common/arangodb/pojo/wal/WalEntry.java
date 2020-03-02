@@ -7,6 +7,4 @@ public interface WalEntry {
   String getTick();
 
   int getType();
-
-  String getDb();
 }

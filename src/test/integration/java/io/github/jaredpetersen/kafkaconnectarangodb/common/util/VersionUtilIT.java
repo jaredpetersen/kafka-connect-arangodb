@@ -1,8 +1,7 @@
-package io.github.jaredpetersen.kafkaconnectarangodb.util;
+package io.github.jaredpetersen.kafkaconnectarangodb.common.util;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Properties;
 import org.junit.jupiter.api.Test;
 
 public class VersionUtilIT {

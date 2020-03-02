@@ -34,8 +34,12 @@ public class ArangoDb {
     private int port = 8529;
     private String jwt;
 
-    public Builder host(String host, int port) {
+    public Builder host(String host) {
       this.host = host;
+      return this;
+    }
+
+    public Builder port (int port) {
       this.port = port;
       return this;
     }
@@ -58,11 +62,10 @@ public class ArangoDb {
   /**
    * Tail the write-ahead log and return all operations.
    * @param from Lower bound tick value for results.
-   * @param chunkSize Approximate maximum size of the returned result.
    * @return All write-ahead log operations.
    * @throws IOException
    */
-  public List<WalEntry> tailWal(Long from, Long chunkSize) throws IOException {
+  public List<WalEntry> tailWal(Long from) throws IOException {
     HttpUrl.Builder urlBuilder = new HttpUrl.Builder()
         .scheme("http")
         .host(this.host)
@@ -71,10 +74,6 @@ public class ArangoDb {
 
     if (from != null) {
       urlBuilder.addQueryParameter("from", String.valueOf(from));
-    }
-
-    if (chunkSize != null) {
-      urlBuilder.addQueryParameter("chunkSize", String.valueOf(chunkSize));
     }
 
     HttpUrl url = urlBuilder.build();

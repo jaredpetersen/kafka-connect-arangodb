@@ -1,0 +1,17 @@
+{ "tick": "2103", "type": 1100, "db": "test", "data": { "database": 337, "id": "337", "name": "test" } }
+{ "tick": "3453", "type": 1101, "db": "test" }
+{ "tick": "3702", "type": 2000, "db": "_system", "cuid": "hC0CF79DA83B4/555", "data": { "allowUserKeys": true, "cacheEnabled": false, "cid": "555", "deleted": false, "globallyUniqueId": "hC0CF79DA83B4/555", "id": "555", "indexes": [], "isSystem": false, "keyOptions": { "allowUserKeys": true, "lastValue": 0, "type": "traditional" }, "name": "test" } }
+{ "tick": "1540", "type": 2001, "db": "_system", "cuid": "hD15F8FE99859/555" }
+{ "tick": "3850", "type": 2002, "db": "_system", "cuid": "hD15F8FE99859/135",  "data": { "name": "other" } }
+{ "tick": "1540", "type": 2003, "db": "_system", "cuid": "hD15F8FE99859/555", "data": { "waitForSync": true } }
+{ "tick": "1541", "type": 2004, "db": "_system", "cuid": "hD15F8FE99859/555" }
+{ "tick": "1327", "type": 2100, "db": "_system", "cuid": "hD15F8FE99859/555", "data": { "deduplicate": true, "fields": [ "value" ], "id": "260", "selectivityEstimate": 1, "sparse": false, "type": "skiplist", "unique": false } }
+{ "tick": "1522", "type": 2101, "db": "_system", "cuid": "hD15F8FE99859/555", "data": { "id": "260" } }
+{ "tick": "1833", "type": 2110, "db": "_system", "cuid": "hD15F8FE99859/322", "data": { "cleanupIntervalStep": 10, "collections": [], "commitIntervalMsec": 60000, "consolidate": { "segmentThreshold": 300, "threshold": 0.8500000238418579, "type": "bytes_accum" }, "deleted": false, "globallyUniqueId": "hD15F8FE99859/322", "id": "322", "isSystem": false, "locale": "C", "name": "myview", "type": "arangosearch" } }
+{ "tick": "3113", "type": 2111, "db": "_system", "cuid": "hD15F8FE99859/322" }
+{ "tick": "3014", "type": 2112, "db": "_system", "cuid": "hD15F8FE99859/457", "data": { "cleanupIntervalStep": 10, "collections": [ 135 ], "commitIntervalMsec": 60000, "consolidate": { "segmentThreshold": 300, "threshold": 0.8500000238418579, "type": "bytes_accum" }, "deleted": false, "globallyUniqueId": "hD15F8FE99859/457", "id": "457", "isSystem": false, "locale": "C", "name": "renamedview", "type": "arangosearch" } }
+{ "tick": "3651", "type": 2200, "db": "_system", "tid": "556" }
+{ "tick": "3652", "type": 2201, "db": "_system", "tid": "556" }
+{ "tick": "3654", "type": 2202, "db": "_system", "tid": "556" }
+{ "tick": "1960", "type": 2300, "db": "_system", "tid": "0", "cuid": "hE0E3D7BE511D/119", "data": { "_id": "users/194", "_key": "194", "_rev": "_XUJFD3C---", "value": "test" } }
+{ "tick": "3901", "type": 2302, "db": "_system", "tid": "0", "cuid": "hE0E3D7BE511D/119", "data": { "_key": "194", "_rev": "_XUJIbS---_" } }
