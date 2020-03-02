@@ -6,6 +6,7 @@ import io.github.jaredpetersen.kafkaconnectarangodb.source.config.ArangoDbSource
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.Task;
 import org.apache.kafka.connect.source.SourceConnector;
+import org.apache.kafka.connect.util.ConnectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,18 +42,13 @@ public class ArangoDbSourceConnector extends SourceConnector {
   @Override
   public List<Map<String, String>> taskConfigs(final int maxTasks) {
     // Get db server addresses from the monitoring thread
-    final Set<String> databaseAddresses = this.databaseHostMonitor.getDatabaseAddresses();
+    final List<String> databaseAddresses = new ArrayList<>(this.databaseHostMonitor.getDatabaseAddresses());
 
     // Split the database addresses into batches that can be distributed amongst the sink tasks
     final int taskCount = Math.min(maxTasks, databaseAddresses.size());
-    final int batchSize = (int) Math.ceil((double) databaseAddresses.size() / taskCount);
-    final AtomicInteger counter = new AtomicInteger();
-    final List<List<String>> databaseAddressBatches = new ArrayList<>(databaseAddresses
-        .stream()
-        .collect(Collectors.groupingBy(address -> counter.incrementAndGet() / batchSize))
-        .values());
+    final List<List<String>> databaseAddressBatches = ConnectorUtils.groupPartitions(databaseAddresses, taskCount);
 
-    final List<Map<String, String>> taskConfigs = new ArrayList<>(taskCount);
+    List<Map<String, String>> taskConfigs = new ArrayList<>();
 
     for (int i = 0; i < taskCount; ++i) {
       Map<String, String> taskConfig = new HashMap<>();

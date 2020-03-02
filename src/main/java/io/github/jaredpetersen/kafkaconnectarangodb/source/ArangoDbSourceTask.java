@@ -5,6 +5,7 @@ import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.Wal
 import io.github.jaredpetersen.kafkaconnectarangodb.common.util.VersionUtil;
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.config.ArangoDbSinkConfig;
 import io.github.jaredpetersen.kafkaconnectarangodb.source.config.ArangoDbSourceConfig;
+import io.github.jaredpetersen.kafkaconnectarangodb.source.config.ArangoDbSourceTaskConfig;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
 import org.slf4j.Logger;
@@ -20,6 +21,8 @@ import java.util.Map;
 public class ArangoDbSourceTask extends SourceTask {
   private static final Logger LOG = LoggerFactory.getLogger(ArangoDbSourceTask.class);
 
+  private ArangoDbSourceTaskConfig config;
+
   private ArangoDb arangoDb;
   private Long lastTick = null;
 
@@ -30,9 +33,7 @@ public class ArangoDbSourceTask extends SourceTask {
 
   @Override
   public void start(Map<String, String> props) {
-    LOG.info("task config: {}", props);
-
-    // TODO create a task config separate from connector config -- task may have to hit multiple db servers
+    this.config = new ArangoDbSourceTaskConfig(props);
 
     // Set up database
     final ArangoDbSourceConfig config = new ArangoDbSourceConfig(props);
