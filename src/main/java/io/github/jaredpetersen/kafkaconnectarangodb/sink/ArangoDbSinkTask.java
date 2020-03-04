@@ -37,10 +37,9 @@ public class ArangoDbSinkTask extends SinkTask {
 
   @Override
   public final void start(final Map<String, String> props) {
-    LOG.info("task config: {}", props);
+    final ArangoDbSinkConfig config = new ArangoDbSinkConfig(props);
 
     // Set up database
-    final ArangoDbSinkConfig config = new ArangoDbSinkConfig(props);
     this.arangoDb = new ArangoDB.Builder()
         .host(config.arangoDbHost, config.arangoDbPort)
         .user(config.arangoDbUser)
