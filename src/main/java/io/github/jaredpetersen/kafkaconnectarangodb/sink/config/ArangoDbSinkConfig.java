@@ -29,6 +29,11 @@ public class ArangoDbSinkConfig extends AbstractConfig {
   private static final String ARANGODB_PASSWORD_DOC = "ArangoDb connection password.";
   public final Password arangoDbPassword;
 
+  private static final String ARANGODB_USE_SSL = "arangodb.useSsl";
+  private static final boolean ARANGODB_USE_SSL_DEFAULT = false;
+  private static final String ARANGODB_USE_SSL_DOC = "ArangoDb use SSL connection.";
+  public final boolean arangoDbUseSsl;
+
   private static final String ARANGODB_DATABASE_NAME = "arangodb.database.name";
   private static final String ARANGODB_DATABASE_NAME_DOC = "ArangoDb database name.";
   public final String arangoDbDatabaseName;
@@ -38,6 +43,7 @@ public class ArangoDbSinkConfig extends AbstractConfig {
       .define(ARANGODB_PORT, Type.INT, Importance.HIGH, ARANGODB_PORT_DOC)
       .define(ARANGODB_USER, Type.STRING, Importance.HIGH, ARANGODB_USER_DOC)
       .define(ARANGODB_PASSWORD, Type.PASSWORD, ARANGODB_PASSWORD_DEFAULT, Importance.HIGH, ARANGODB_PASSWORD_DOC)
+      .define(ARANGODB_USE_SSL, Type.BOOLEAN, ARANGODB_USE_SSL_DEFAULT, Importance.HIGH, ARANGODB_USE_SSL_DOC)
       .define(ARANGODB_DATABASE_NAME, Type.STRING, Importance.HIGH, ARANGODB_DATABASE_NAME_DOC);
 
   /**
@@ -53,6 +59,7 @@ public class ArangoDbSinkConfig extends AbstractConfig {
     this.arangoDbPort = getInt(ARANGODB_PORT);
     this.arangoDbUser = getString(ARANGODB_USER);
     this.arangoDbPassword = getPassword(ARANGODB_PASSWORD);
+    this.arangoDbUseSsl = getBoolean(ARANGODB_USE_SSL);
     this.arangoDbDatabaseName = getString(ARANGODB_DATABASE_NAME);
   }
 }
