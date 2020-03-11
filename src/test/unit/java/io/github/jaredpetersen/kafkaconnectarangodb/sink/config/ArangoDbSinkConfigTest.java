@@ -15,6 +15,7 @@ public class ArangoDbSinkConfigTest {
     originalsStub.put("arangodb.port", "8529");
     originalsStub.put("arangodb.user", "root");
     originalsStub.put("arangodb.password", "password");
+    originalsStub.put("arangodb.useSsl", true);
     originalsStub.put("arangodb.database.name", "kafka-connect-arangodb");
 
     return originalsStub;
@@ -96,6 +97,23 @@ public class ArangoDbSinkConfigTest {
     final ArangoDbSinkConfig config = new ArangoDbSinkConfig(originalsStub);
 
     assertEquals(originalsStub.get("arangodb.password"), config.arangoDbPassword.value());
+  }
+
+  @Test
+  public void configGetUseSslReturnsUseSsl() {
+    final Map<String, Object> originalsStub = buildConfigMap();
+    final ArangoDbSinkConfig config = new ArangoDbSinkConfig(originalsStub);
+
+    assertEquals(originalsStub.get("arangodb.useSsl"), config.arangoDbUseSsl);
+  }
+
+  @Test
+  public void configGetUseSslReturnsDefaultValue() {
+    final Map<String, Object> originalsStub = buildConfigMap();
+    originalsStub.remove("arangodb.useSsl");
+    final ArangoDbSinkConfig config = new ArangoDbSinkConfig(originalsStub);
+
+    assertEquals(false, config.arangoDbUseSsl);
   }
 
   @Test

@@ -5,7 +5,7 @@
 
   <groupId>io.github.jaredpetersen</groupId>
   <artifactId>kafka-connect-arangodb</artifactId>
-  <version>1.0.6</version>
+  <version>1.0.7</version>
   <packaging>jar</packaging>
 
   <name>kafka-connect-arangodb</name>

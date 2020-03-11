@@ -85,6 +85,7 @@ In most situations, the record values that you will want to sink into ArangoDB i
 | `arangodb.port`          | ArangoDB server host port number.   | int      |         | high       |
 | `arangodb.user`          | ArangoDB connection username.       | string   |         | high       |
 | `arangodb.password`      | ArangoDB connection password.       | password | ""      | high       |
+| `arangodb.useSsl`        | ArangoDB use SSL connection.        | boolean  | false   | high       |
 | `arangodb.database.name` | ArangoDB database name.             | string   |         | high       |
 
 ### Single Message Transformations

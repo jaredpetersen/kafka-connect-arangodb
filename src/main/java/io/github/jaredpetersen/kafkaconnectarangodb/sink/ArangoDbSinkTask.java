@@ -46,6 +46,7 @@ public class ArangoDbSinkTask extends SinkTask {
         .host(config.arangoDbHost, config.arangoDbPort)
         .user(config.arangoDbUser)
         .password(config.arangoDbPassword.value())
+        .useSsl(config.arangoDbUseSsl)
         .build();
     final ArangoDatabase database = arangodb.db(config.arangoDbDatabaseName);
 
