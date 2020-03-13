@@ -56,6 +56,11 @@ public class ArangoDbSourceTask extends SourceTask {
       reader.read();
     }
 
+    // partition is an object that represents where the record came from, e.g.
+    // { "db": "database_name", "collection": "table_name"}
+
+    // offset would be like the tick value
+
     return null;
   }
 
