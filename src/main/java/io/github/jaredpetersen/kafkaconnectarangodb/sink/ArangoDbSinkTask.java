@@ -7,11 +7,13 @@ import io.github.jaredpetersen.kafkaconnectarangodb.sink.config.ArangoDbSinkConf
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.ArangoRecord;
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.RecordConverter;
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.Writer;
-import io.github.jaredpetersen.kafkaconnectarangodb.common.util.VersionUtil;
+import io.github.jaredpetersen.kafkaconnectarangodb.util.VersionUtil;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.apache.kafka.connect.json.JsonConverter;
 import org.apache.kafka.connect.json.JsonConverterConfig;
 import org.apache.kafka.connect.json.JsonDeserializer;
@@ -26,7 +28,6 @@ import org.slf4j.LoggerFactory;
 public class ArangoDbSinkTask extends SinkTask {
   private static final Logger LOG = LoggerFactory.getLogger(ArangoDbSinkTask.class);
 
-  private ArangoDB arangoDb;
   private RecordConverter recordConverter;
   private Writer writer;
 
@@ -37,15 +38,17 @@ public class ArangoDbSinkTask extends SinkTask {
 
   @Override
   public final void start(final Map<String, String> props) {
-    final ArangoDbSinkConfig config = new ArangoDbSinkConfig(props);
+    LOG.info("task config: {}", props);
 
     // Set up database
-    this.arangoDb = new ArangoDB.Builder()
+    final ArangoDbSinkConfig config = new ArangoDbSinkConfig(props);
+    final ArangoDB arangodb = new ArangoDB.Builder()
         .host(config.arangoDbHost, config.arangoDbPort)
         .user(config.arangoDbUser)
         .password(config.arangoDbPassword.value())
+        .useSsl(config.arangoDbUseSsl)
         .build();
-    final ArangoDatabase database = this.arangoDb.db(config.arangoDbDatabaseName);
+    final ArangoDatabase database = arangodb.db(config.arangoDbDatabaseName);
 
     // Set up the record converter
     final JsonConverter jsonConverter = new JsonConverter();
@@ -81,6 +84,6 @@ public class ArangoDbSinkTask extends SinkTask {
 
   @Override
   public final void stop() {
-    this.arangoDb.shutdown();
+    // Do nothing
   }
 }

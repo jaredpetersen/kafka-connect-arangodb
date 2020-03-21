@@ -1,7 +1,7 @@
 package io.github.jaredpetersen.kafkaconnectarangodb.sink;
 
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.config.ArangoDbSinkConfig;
-import io.github.jaredpetersen.kafkaconnectarangodb.common.util.VersionUtil;
+import io.github.jaredpetersen.kafkaconnectarangodb.util.VersionUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +14,11 @@ import org.apache.kafka.connect.sink.SinkConnector;
  */
 public class ArangoDbSinkConnector extends SinkConnector {
   private Map<String, String> config;
+
+  @Override
+  public final String version() {
+    return VersionUtil.getVersion();
+  }
 
   @Override
   public final void start(final Map<String, String> props) {
@@ -44,10 +49,5 @@ public class ArangoDbSinkConnector extends SinkConnector {
   @Override
   public final ConfigDef config() {
     return ArangoDbSinkConfig.CONFIG_DEF;
-  }
-
-  @Override
-  public final String version() {
-    return VersionUtil.getVersion();
   }
 }
