@@ -1,7 +1,7 @@
 package io.github.jaredpetersen.kafkaconnectarangodb.sink;
 
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.config.ArangoDbSinkConfig;
-import io.github.jaredpetersen.kafkaconnectarangodb.util.VersionUtil;
+import io.github.jaredpetersen.kafkaconnectarangodb.common.util.VersionUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

@@ -22,6 +22,7 @@ public class ArangoDbSourceConnector extends SourceConnector {
   private DatabaseHostMonitorThread databaseHostMonitor = null;
 
   private static final Logger LOG = LoggerFactory.getLogger(ArangoDbSourceConnector.class);
+  private static final long POLL_INTERVAL = 30_000;
 
   @Override
   public void start(Map<String, String> props) {
@@ -29,8 +30,7 @@ public class ArangoDbSourceConnector extends SourceConnector {
 
     // Start a database monitoring thread to keep track of IP addresses
     // This allows us to be flexible as the database scales up / down
-    long pollInterval = 30000;
-    this.databaseHostMonitor = new DatabaseHostMonitorThread(this.context, pollInterval, this.config.getConnectionUrl());
+    this.databaseHostMonitor = new DatabaseHostMonitorThread(this.context, POLL_INTERVAL, this.config.getConnectionUrl());
     this.databaseHostMonitor.start();
   }
 

@@ -27,15 +27,6 @@ class Deserializer extends JsonDeserializer<WalEntry> {
     WalEntry entry;
 
     switch(type) {
-      case START_TRANSACTION_CODE:
-        entry = mapper.readValue(node.toString(), StartTransaction.class);
-        break;
-      case COMMIT_TRANSACTION_CODE:
-        entry = mapper.readValue(node.toString(), CommitTransaction.class);
-        break;
-      case ABORT_TRANSACTION_CODE:
-        entry = mapper.readValue(node.toString(), AbortTransaction.class);
-        break;
       case REPSERT_DOCUMENT_CODE:
         entry = mapper.readValue(node.toString(), RepsertDocument.class);
         break;
