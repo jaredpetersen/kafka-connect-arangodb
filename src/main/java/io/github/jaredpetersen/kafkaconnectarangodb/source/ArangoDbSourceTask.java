@@ -1,29 +1,30 @@
 package io.github.jaredpetersen.kafkaconnectarangodb.source;
 
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.ArangoDb;
+import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.WalEntry;
+import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.operations.Operation;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.util.VersionUtil;
-import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.ArangoRecord;
 import io.github.jaredpetersen.kafkaconnectarangodb.source.config.ArangoDbSourceTaskConfig;
 import io.github.jaredpetersen.kafkaconnectarangodb.source.reader.Reader;
-import io.github.jaredpetersen.kafkaconnectarangodb.source.reader.ArangoRecordRevComparator;
+import io.github.jaredpetersen.kafkaconnectarangodb.source.reader.WalEntryRevComparator;
+import io.github.jaredpetersen.kafkaconnectarangodb.source.reader.RecordConverter;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Kafka Connect Task for Kafka Connect ArangoDb Source.
  */
 public class ArangoDbSourceTask extends SourceTask {
   private List<Reader> readers;
-  private Long lastTick = null;
+  private final RecordConverter recordConverter = new RecordConverter();
+  private final Comparator<WalEntry> walEntryRevComparator = new WalEntryRevComparator();
 
   private static final Logger LOG = LoggerFactory.getLogger(ArangoDbSourceTask.class);
-  private static final ArangoRecordRevComparator ARANGO_RECORD_REV_COMPARATOR = new ArangoRecordRevComparator();
 
   @Override
   public String version() {
@@ -33,6 +34,9 @@ public class ArangoDbSourceTask extends SourceTask {
   @Override
   public void start(Map<String, String> props) {
     final ArangoDbSourceTaskConfig config = new ArangoDbSourceTaskConfig(props);
+
+    // TODO handle restarts
+//    this.context.offsetStorageReader().offset()
 
     // Set up readers
     this.readers = new ArrayList<>();
@@ -53,21 +57,18 @@ public class ArangoDbSourceTask extends SourceTask {
   public List<SourceRecord> poll() throws InterruptedException {
     LOG.info("reading record(s)");
 
-    List<SourceRecord> records = new ArrayList<>();
+    List<WalEntry> walEntries = new ArrayList<>();
 
     for (Reader reader : this.readers) {
-      records.addAll(reader.read());
+      walEntries.addAll(reader.read());
     }
 
-    // Sort based on ArangoDb _rev
-//    records.sort(ARANGO_RECORD_REV_COMPARATOR);
-
-    // partition is an object that represents where the record came from, e.g.
-    // { "db": "database_name", "collection": "table_name"}
-
-    // offset would be like the tick value
-
-    return null;
+    return walEntries.stream()
+        .filter(walEntry -> !(walEntry instanceof Operation))
+        .sorted(walEntryRevComparator)
+        .map(recordConverter::convert)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
   }
 
   @Override

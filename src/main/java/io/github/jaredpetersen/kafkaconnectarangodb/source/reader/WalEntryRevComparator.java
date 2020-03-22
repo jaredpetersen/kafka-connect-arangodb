@@ -1,10 +1,11 @@
 package io.github.jaredpetersen.kafkaconnectarangodb.source.reader;
 
+import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.WalEntry;
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.ArangoRecord;
 
 import java.util.Comparator;
 
-public class ArangoRecordRevComparator implements Comparator<ArangoRecord> {
+public class WalEntryRevComparator implements Comparator<WalEntry> {
   private final byte[] decodeTable = {
       -1, -1, -1, -1, -1, -1, -1, -1,
       -1, -1, -1, -1, -1, -1, -1, -1,  //   0 - 15
@@ -40,10 +41,7 @@ public class ArangoRecordRevComparator implements Comparator<ArangoRecord> {
       -1, -1, -1, -1, -1, -1, -1, -1 };  // 240 - 255
 
   @Override
-  public int compare(ArangoRecord arangoRecord1, ArangoRecord arangoRecord2) {
-    long decodedRev1 = decode(arangoRecord1);
-    long decodedRev2 = decode(arangoRecord2);
-
+  public int compare(WalEntry walEntry1, WalEntry walEntry2) {
     return 0;
   }
 
