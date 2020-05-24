@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class ArangoDbSourceConfig extends AbstractConfig {
   public static final String CONNECTION_URL = "connection.url";
-  private static final String CONNECTION_URL_DOC = "Connection url.";
+  private static final String CONNECTION_URL_DOC = "Connection url. Can be a domain that returns multiple DNS A records for cluster support OR point to a single ArangoDB server";
 
   public static final String CONNECTION_JWT = "connection.jwt";
   private static final String CONNECTION_JWT_DOC = "Connection JSON Web Token. Must be superuser in order to tail the Write-Ahead Log.";

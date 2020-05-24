@@ -89,6 +89,12 @@ TOD) pass syncer ID
 
 https://github.com/arangodb/arangodb/pull/9473/files
 
-_rev uses Hybrid Logical Clock. 
+_rev uses Hybrid Logical Clock. However, this doesn't exist on every WAL record.
 
-Can't decode _rev though because it's not supported and because it doesn't exist on every object
+Notable things that don't include it are index create/drop operations. ArangoSync supports these though, so it probably doesn't use the WAL
+
+RocksDB means no transactions
+
+What about using the incremental replication?
+
+GET /_api/replication/clusterInventory -- returns collections and indexes for everything in the cluster
