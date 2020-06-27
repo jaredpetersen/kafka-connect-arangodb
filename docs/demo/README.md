@@ -10,7 +10,7 @@ Set up the cluster with a docker registry and some extra juice:
 minikube start --cpus 2 --memory 10g --kubernetes-version v1.17.6
 ```
 
-Unfortunately, we have to peg the Kubernetes version to v1.17 due to a [bug in Minikube](https://github.com/kubernetes/minikube/issues/7828).
+Unfortunately, we have to peg the Kubernetes version to v1.17.6 due to a [bug in Minikube](https://github.com/kubernetes/minikube/issues/7828).
 
 ### Docker
 Now that we have a cluster, we'll need a Docker image that contains the Kafka Connect ArangoDB plugin. Navigate to `docker/` and run the following commands in a separate terminal to download the plugin and build the image for Minikube:

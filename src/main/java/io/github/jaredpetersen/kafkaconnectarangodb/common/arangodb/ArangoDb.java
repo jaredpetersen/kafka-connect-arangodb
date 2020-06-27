@@ -28,11 +28,17 @@ public class ArangoDb {
     this.mapper = new ObjectMapper();
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public static class Builder {
     private String scheme = "http";
     private String host;
     private int port = 8529;
     private String jwt;
+
+    private Builder() {}
 
     public Builder host(String host) {
       this.host = host;
@@ -67,7 +73,7 @@ public class ArangoDb {
    */
   public List<WalEntry> tailWal(Long from) throws IOException {
     HttpUrl.Builder urlBuilder = new HttpUrl.Builder()
-        .scheme("http")
+        .scheme(this.scheme)
         .host(this.host)
         .port(this.port)
         .addPathSegments("_api/_wal/tail");

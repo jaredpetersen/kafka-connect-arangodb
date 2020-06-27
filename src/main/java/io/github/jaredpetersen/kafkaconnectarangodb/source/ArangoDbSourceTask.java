@@ -3,6 +3,7 @@ package io.github.jaredpetersen.kafkaconnectarangodb.source;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.ArangoDb;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.WalEntry;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.operations.Operation;
+import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.operations.RepsertDocument;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.util.VersionUtil;
 import io.github.jaredpetersen.kafkaconnectarangodb.source.config.ArangoDbSourceTaskConfig;
 import io.github.jaredpetersen.kafkaconnectarangodb.source.reader.Reader;
@@ -42,9 +43,10 @@ public class ArangoDbSourceTask extends SourceTask {
     this.readers = new ArrayList<>();
 
     for (String connectionUrl : config.getConnectionUrls()) {
-      ArangoDb arangoDb = new ArangoDb.Builder()
+      ArangoDb arangoDb = ArangoDb.builder()
           .host(connectionUrl)
           .jwt(config.getConnectionJwt().value())
+          .database("_system");
           // TODO specify database
           .build();
       Reader reader = new Reader(arangoDb);
@@ -62,6 +64,7 @@ public class ArangoDbSourceTask extends SourceTask {
     for (Reader reader : this.readers) {
       walEntries.addAll(reader.read());
     }
+    new RepsertDocument.Builder();
 
     return walEntries.stream()
         .filter(walEntry -> !(walEntry instanceof Operation))
