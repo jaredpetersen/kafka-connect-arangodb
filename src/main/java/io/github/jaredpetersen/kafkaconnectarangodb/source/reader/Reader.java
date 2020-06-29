@@ -5,8 +5,7 @@ import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.Wal
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.List;
 
 public class Reader {
   private static final Logger LOG = LoggerFactory.getLogger(Reader.class);
@@ -20,18 +19,8 @@ public class Reader {
   }
 
   public List<WalEntry> read() {
-    List<WalEntry> walEntries;
-
-    try {
-      walEntries = this.arangoDb.tailWal(lastTick);
-      LOG.info("result: {}", walEntries);
-    }
-    catch (IOException exception) {
-      LOG.error("failed to tail WAL of X", exception);
-      // TODO some better error handling
-      // RetriableException?
-      walEntries = Collections.emptyList();
-    }
+    final List<WalEntry> walEntries = this.arangoDb.tailWal(lastTick);
+    LOG.info("result: {}", walEntries);
 
     this.lastTick = Long.parseLong(walEntries.get(walEntries.size() - 1).getTick());
 

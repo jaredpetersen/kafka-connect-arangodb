@@ -43,11 +43,10 @@ public class ArangoDbSourceTask extends SourceTask {
     this.readers = new ArrayList<>();
 
     for (String connectionUrl : config.getConnectionUrls()) {
-      ArangoDb arangoDb = ArangoDb.builder()
+      final ArangoDb arangoDb = ArangoDb.builder()
           .host(connectionUrl)
           .jwt(config.getConnectionJwt().value())
-          .database("_system");
-          // TODO specify database
+          .database("_system")
           .build();
       Reader reader = new Reader(arangoDb);
 
@@ -59,12 +58,16 @@ public class ArangoDbSourceTask extends SourceTask {
   public List<SourceRecord> poll() throws InterruptedException {
     LOG.info("reading record(s)");
 
-    List<WalEntry> walEntries = new ArrayList<>();
+    final List<WalEntry> walEntries = new ArrayList<>();
 
     for (Reader reader : this.readers) {
+      // TODO we need the actual converted time (not the tick time)
       walEntries.addAll(reader.read());
     }
-    new RepsertDocument.Builder();
+
+    walEntries.sort(new WalEntryComparator());
+
+//    new RepsertDocument.Builder();
 
     return walEntries.stream()
         .filter(walEntry -> !(walEntry instanceof Operation))
@@ -77,5 +80,13 @@ public class ArangoDbSourceTask extends SourceTask {
   @Override
   public void stop() {
     // TODO save lastTick from all of the readers along with the host
+  }
+
+  private static class WalEntryComparator implements Comparator<WalEntry> {
+    @Override
+    public int compare(WalEntry o1, WalEntry o2) {
+      o1.getTick()
+      return 0;
+    }
   }
 }
