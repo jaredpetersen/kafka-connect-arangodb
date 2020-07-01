@@ -1,12 +1,15 @@
 package io.github.jaredpetersen.kafkaconnectarangodb.source.reader;
 
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.WalEntry;
+import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.operations.RemoveDocument;
+import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.operations.RepsertDocument;
 import io.github.jaredpetersen.kafkaconnectarangodb.sink.writer.ArangoRecord;
+import org.apache.kafka.connect.source.SourceRecord;
 
 import java.util.Comparator;
 
 public class WalEntryRevComparator implements Comparator<WalEntry> {
-  private final byte[] decodeTable = {
+  private static final byte[] decodeTable = {
       -1, -1, -1, -1, -1, -1, -1, -1,
       -1, -1, -1, -1, -1, -1, -1, -1,   //   0 - 15
       -1, -1, -1, -1, -1, -1, -1, -1,
@@ -42,7 +45,37 @@ public class WalEntryRevComparator implements Comparator<WalEntry> {
 
   @Override
   public int compare(WalEntry walEntry1, WalEntry walEntry2) {
-    return 0;
+    final Long walEntry1HybridLogicalClock = convert(walEntry1);
+    final Long walEntry2HybridLogicalClock = convert(walEntry2);
+
+    if (walEntry1HybridLogicalClock == null && walEntry2HybridLogicalClock == null) {
+      return 0;
+    }
+    else if (walEntry1HybridLogicalClock == null) {
+      return -1;
+    }
+    else if (walEntry2HybridLogicalClock == null) {
+      return 1;
+    }
+    else {
+      return walEntry1HybridLogicalClock.compareTo(walEntry2HybridLogicalClock);
+    }
+  }
+
+  private Long convert(WalEntry walEntry) {
+    final String rev;
+
+    if (walEntry instanceof RemoveDocument) {
+      rev = ((RemoveDocument) walEntry).getData().get("_rev").asText();
+    }
+    else if (walEntry instanceof RepsertDocument) {
+      rev = ((RepsertDocument) walEntry).getData().get("_rev").asText();
+    }
+    else {
+      rev = null;
+    }
+
+    return (rev != null) ? decode(rev) : null;
   }
 
   private long decode(String rev) {

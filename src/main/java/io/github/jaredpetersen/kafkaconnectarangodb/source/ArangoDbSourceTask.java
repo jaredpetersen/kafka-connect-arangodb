@@ -7,6 +7,7 @@ import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.ope
 import io.github.jaredpetersen.kafkaconnectarangodb.common.util.VersionUtil;
 import io.github.jaredpetersen.kafkaconnectarangodb.source.config.ArangoDbSourceTaskConfig;
 import io.github.jaredpetersen.kafkaconnectarangodb.source.reader.Reader;
+import io.github.jaredpetersen.kafkaconnectarangodb.source.reader.SourceRecordComparator;
 import io.github.jaredpetersen.kafkaconnectarangodb.source.reader.WalEntryRevComparator;
 import io.github.jaredpetersen.kafkaconnectarangodb.source.reader.RecordConverter;
 import org.apache.kafka.connect.source.SourceRecord;
@@ -22,8 +23,8 @@ import java.util.stream.Collectors;
  */
 public class ArangoDbSourceTask extends SourceTask {
   private List<Reader> readers;
-  private final RecordConverter recordConverter = new RecordConverter();
-  private final Comparator<WalEntry> walEntryRevComparator = new WalEntryRevComparator();
+  private final WalEntryRevComparator walEntryRevComparator = new WalEntryRevComparator();
+  private final List<WalEntry> walEntries = new ArrayList<>();
 
   private static final Logger LOG = LoggerFactory.getLogger(ArangoDbSourceTask.class);
 
@@ -48,9 +49,8 @@ public class ArangoDbSourceTask extends SourceTask {
           .jwt(config.getConnectionJwt().value())
           .database("_system")
           .build();
-      Reader reader = new Reader(arangoDb);
 
-      this.readers.add(reader);
+      this.readers.add(new Reader(arangoDb));
     }
   }
 
@@ -58,35 +58,22 @@ public class ArangoDbSourceTask extends SourceTask {
   public List<SourceRecord> poll() throws InterruptedException {
     LOG.info("reading record(s)");
 
-    final List<WalEntry> walEntries = new ArrayList<>();
-
     for (Reader reader : this.readers) {
-      // TODO we need the actual converted time (not the tick time)
       walEntries.addAll(reader.read());
     }
 
-    walEntries.sort(new WalEntryComparator());
+    // Sort records by the _rev field, which is a Hybrid Logical Clock under the covers
+    walEntries.sort(walEntryRevComparator);
 
-//    new RepsertDocument.Builder();
+    LOG.info(walEntries.toString());
 
-    return walEntries.stream()
-        .filter(walEntry -> !(walEntry instanceof Operation))
-        .sorted(walEntryRevComparator)
-        .map(recordConverter::convert)
-        .filter(Objects::nonNull)
-        .collect(Collectors.toList());
+    // Return records that have been around "long enough", i.e. we're confident that we're
+    // not going to have any stragglers come in later to ruin our ordering
+    return Collections.emptyList();
   }
 
   @Override
   public void stop() {
     // TODO save lastTick from all of the readers along with the host
-  }
-
-  private static class WalEntryComparator implements Comparator<WalEntry> {
-    @Override
-    public int compare(WalEntry o1, WalEntry o2) {
-      o1.getTick()
-      return 0;
-    }
   }
 }
