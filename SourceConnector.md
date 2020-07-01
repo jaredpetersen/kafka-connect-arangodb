@@ -32,9 +32,14 @@ Source system
   - Generate one ourselves using secret
   
 https://www.arangodb.com/docs/stable/deployment-kubernetes-services-and-load-balancer.html
-  
+
+```
 kubectl -n kca-demo run -it --rm --restart=Never alpine --image=alpine
 apk add curl
+```
+```
+kubectl -n kca-demo run -it --rm --restart=Never curl --image=curlimages/curl
+```
 
 https://www.arangodb.com/docs/stable/http/general.html#superuser-jwt-token
 

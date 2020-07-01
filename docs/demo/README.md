@@ -17,7 +17,7 @@ Now that we have a cluster, we'll need a Docker image that contains the Kafka Co
 ```bash
 curl -O 'https://search.maven.org/remotecontent?filepath=io/github/jaredpetersen/kafka-connect-arangodb/1.0.6/kafka-connect-arangodb-1.0.6.jar'
 eval $(minikube docker-env)
-docker build -t jaredpetersen/kafka-connect-arangodb:1.0.6 .
+docker build -t jaredpetersen/kafka-connect-arangodb:latest .
 ```
 
 Close out this terminal when you're done -- we want to go back to our normal Docker environment.

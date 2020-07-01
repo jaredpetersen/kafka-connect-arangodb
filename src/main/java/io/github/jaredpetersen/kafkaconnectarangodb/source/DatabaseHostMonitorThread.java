@@ -81,8 +81,9 @@ public class DatabaseHostMonitorThread extends Thread {
     // Get IP addresses for host
     try {
       foundAddresses = InetAddress.getAllByName(host);
+      LOG.info("found database servers " + Arrays.toString(foundAddresses));
     } catch (UnknownHostException exception) {
-      LOG.error("host does not exist");
+      LOG.error("host does not exist", exception);
       foundAddresses = new InetAddress[]{};
     }
 

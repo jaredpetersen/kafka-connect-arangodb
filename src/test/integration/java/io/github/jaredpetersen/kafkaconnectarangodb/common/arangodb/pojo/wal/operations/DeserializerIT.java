@@ -32,9 +32,6 @@ public class DeserializerIT {
     assertEquals(Operation.class, walEntries.get(9).getClass());
     assertEquals(Operation.class, walEntries.get(10).getClass());
     assertEquals(Operation.class, walEntries.get(11).getClass());
-    assertEquals(StartTransaction.class, walEntries.get(12).getClass());
-    assertEquals(CommitTransaction.class, walEntries.get(13).getClass());
-    assertEquals(AbortTransaction.class, walEntries.get(14).getClass());
     assertEquals(RepsertDocument.class, walEntries.get(15).getClass());
     assertEquals(RemoveDocument.class, walEntries.get(16).getClass());
   }
