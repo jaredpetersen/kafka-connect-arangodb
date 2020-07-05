@@ -7,6 +7,6 @@ import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.Wal
 import java.util.List;
 
 interface ArangoDbClient {
-    @RequestLine("GET /_wal/tail?from={from}")
-    List<WalEntry> tailWal(@Param("from") long from);
+    @RequestLine("GET /wal/tail?from={from}")
+    List<WalEntry> tailWal(@Param("from") Long from);
 }

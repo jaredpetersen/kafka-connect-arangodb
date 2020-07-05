@@ -2,21 +2,16 @@ package io.github.jaredpetersen.kafkaconnectarangodb.source;
 
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.ArangoDb;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.WalEntry;
-import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.operations.Operation;
-import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.operations.RepsertDocument;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.util.VersionUtil;
 import io.github.jaredpetersen.kafkaconnectarangodb.source.config.ArangoDbSourceTaskConfig;
 import io.github.jaredpetersen.kafkaconnectarangodb.source.reader.Reader;
-import io.github.jaredpetersen.kafkaconnectarangodb.source.reader.SourceRecordComparator;
 import io.github.jaredpetersen.kafkaconnectarangodb.source.reader.WalEntryRevComparator;
-import io.github.jaredpetersen.kafkaconnectarangodb.source.reader.RecordConverter;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Kafka Connect Task for Kafka Connect ArangoDb Source.
@@ -45,9 +40,9 @@ public class ArangoDbSourceTask extends SourceTask {
 
     for (String connectionUrl : config.getConnectionUrls()) {
       final ArangoDb arangoDb = ArangoDb.builder()
-          .host(connectionUrl)
+          .baseUrl(connectionUrl)
           .jwt(config.getConnectionJwt().value())
-          .database("_system")
+          .database(config.getDatabaseName())
           .build();
 
       this.readers.add(new Reader(arangoDb));
@@ -55,7 +50,7 @@ public class ArangoDbSourceTask extends SourceTask {
   }
 
   @Override
-  public List<SourceRecord> poll() throws InterruptedException {
+  public List<SourceRecord> poll() {
     LOG.info("reading record(s)");
 
     for (Reader reader : this.readers) {

@@ -12,6 +12,6 @@ public class JwtAuthInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate requestTemplate) {
-        requestTemplate.header("Authorization", this.jwt);
+        requestTemplate.header("Authorization", "bearer " + this.jwt);
     }
 }

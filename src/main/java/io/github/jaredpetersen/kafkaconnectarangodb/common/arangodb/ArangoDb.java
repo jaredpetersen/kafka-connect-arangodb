@@ -16,10 +16,8 @@ public class ArangoDb {
     private final ArangoDbClient client;
 
     private ArangoDb(Builder builder) {
-        final String url = builder.scheme
-            + builder.host
-            + builder.port
-            + "/_db"
+        final String url = builder.baseUrl
+            + "/_db/"
             + builder.database
             + "/_api";
 
@@ -36,7 +34,7 @@ public class ArangoDb {
      * @param from Lower bound tick value for results.
      * @return All write-ahead log operations.
      */
-    public List<WalEntry> tailWal(long from) {
+    public List<WalEntry> tailWal(Long from) {
         return this.client.tailWal(from);
     }
 
@@ -45,26 +43,14 @@ public class ArangoDb {
     }
 
     public static class Builder {
-        private String scheme = "http";
-        private String host;
-        private int port = 8529;
+        private String baseUrl;
         private String jwt;
         private String database;
 
         private Builder() {}
 
-        public Builder host(String host) {
-            this.host = host;
-            return this;
-        }
-
-        public Builder port (int port) {
-            this.port = port;
-            return this;
-        }
-
-        public Builder ssl(boolean useSsl) {
-            this.scheme = (useSsl) ? "https" : "http";
+        public Builder baseUrl(String baseUrl) {
+            this.baseUrl = baseUrl;
             return this;
         }
 

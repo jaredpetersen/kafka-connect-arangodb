@@ -15,6 +15,7 @@ public class Reader {
   }
 
   public List<WalEntry> read() {
+    // TODO fix bug where we don't initially have a lastTick
     final List<WalEntry> walEntries = this.arangoDb.tailWal(lastTick);
 
     this.lastTick = Long.parseLong(walEntries.get(walEntries.size() - 1).getTick());

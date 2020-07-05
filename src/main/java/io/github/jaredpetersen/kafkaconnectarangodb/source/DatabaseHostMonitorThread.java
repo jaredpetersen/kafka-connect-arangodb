@@ -87,8 +87,10 @@ public class DatabaseHostMonitorThread extends Thread {
       foundAddresses = new InetAddress[]{};
     }
 
+    // TODO look into how https affects this
+    // TODO default to port 8529 and fallback to 80
     return Arrays.stream(foundAddresses)
-        .map(InetAddress::getHostAddress)
+        .map(address -> "http://" + address.getHostAddress() + ":8529")
         .collect(Collectors.toSet());
   }
 }

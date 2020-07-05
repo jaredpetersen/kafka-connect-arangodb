@@ -6,13 +6,10 @@ import io.github.jaredpetersen.kafkaconnectarangodb.source.config.ArangoDbSource
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.Task;
 import org.apache.kafka.connect.source.SourceConnector;
-import org.apache.kafka.connect.util.ConnectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * Entry point for Kafka Connect ArangoDB Source.
@@ -44,20 +41,14 @@ public class ArangoDbSourceConnector extends SourceConnector {
     // Get db server addresses from the monitoring thread
     final List<String> databaseAddresses = new ArrayList<>(this.databaseHostMonitor.getDatabaseAddresses());
 
-    // Split the database addresses into batches that can be distributed amongst the sink tasks
-    final int taskCount = Math.min(maxTasks, databaseAddresses.size());
-    final List<List<String>> databaseAddressBatches = ConnectorUtils.groupPartitions(databaseAddresses, taskCount);
+    // Can only use one task because we need to combine the data from ArangoDB before sending it off
+    final Map<String, String> taskConfig = new HashMap<>();
+    taskConfig.put(ArangoDbSourceTaskConfig.CONNECTION_URL, String.join(",", databaseAddresses));
+    taskConfig.put(ArangoDbSourceTaskConfig.CONNECTION_JWT, this.config.getConnectionJwt().value());
+    taskConfig.put(ArangoDbSourceTaskConfig.DB_NAME, this.config.getDatabaseName());
 
-    List<Map<String, String>> taskConfigs = new ArrayList<>();
-
-    for (int i = 0; i < taskCount; ++i) {
-      Map<String, String> taskConfig = new HashMap<>();
-      taskConfig.put(ArangoDbSourceTaskConfig.CONNECTION_URL, String.join(",", databaseAddressBatches.get(i)));
-      taskConfig.put(ArangoDbSourceTaskConfig.CONNECTION_JWT, this.config.getConnectionJwt().value());
-      taskConfig.put(ArangoDbSourceTaskConfig.DB_NAME, String.join(",", this.config.getDatabaseNames()));
-
-      taskConfigs.add(taskConfig);
-    }
+    final List<Map<String, String>> taskConfigs = new ArrayList<>();
+    taskConfigs.add(taskConfig);
 
     return taskConfigs;
   }

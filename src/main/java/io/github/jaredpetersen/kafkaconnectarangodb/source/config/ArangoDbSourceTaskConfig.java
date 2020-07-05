@@ -5,15 +5,13 @@ import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigDef.Importance;
 import org.apache.kafka.common.config.ConfigDef.Type;
 import org.apache.kafka.common.config.types.Password;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
-public class ArangoDbSourceConfig extends AbstractConfig {
+public class ArangoDbSourceTaskConfig extends AbstractConfig {
   public static final String CONNECTION_URL = "connection.url";
-  private static final String CONNECTION_URL_DOC = "Connection url. Can be a domain that returns multiple DNS A records pointing to database servers for cluster support OR point to a single database server.";
+  private static final String CONNECTION_URL_DOC = "Comma-separated list of database servers.";
 
   public static final String CONNECTION_JWT = "connection.jwt";
   private static final String CONNECTION_JWT_DOC = "Connection JSON Web Token. Must be superuser in order to tail the Write-Ahead Log.";
@@ -22,7 +20,7 @@ public class ArangoDbSourceConfig extends AbstractConfig {
   private static final String DB_NAME_DOC = "Database name.";
 
   public static final ConfigDef CONFIG_DEF = new ConfigDef()
-      .define(CONNECTION_URL, Type.STRING, Importance.HIGH, CONNECTION_URL_DOC)
+      .define(CONNECTION_URL, Type.LIST, Importance.HIGH, CONNECTION_URL_DOC)
       .define(CONNECTION_JWT, Type.PASSWORD, Importance.HIGH, CONNECTION_JWT_DOC)
       .define(DB_NAME, Type.STRING, Importance.HIGH, DB_NAME_DOC);
 
@@ -30,12 +28,12 @@ public class ArangoDbSourceConfig extends AbstractConfig {
    * Configuration for ArangoDB Sink.
    * @param originals configurations.
    */
-  public ArangoDbSourceConfig(final Map<?, ?> originals) {
+  public ArangoDbSourceTaskConfig(final Map<?, ?> originals) {
     super(CONFIG_DEF, originals, true);
   }
 
-  public String getConnectionUrl() {
-    return getString(CONNECTION_URL);
+  public List<String> getConnectionUrls() {
+    return getList(CONNECTION_URL);
   }
 
   public Password getConnectionJwt() {
