@@ -27,7 +27,7 @@ curl --request POST \
             "topics": "stream.airports,stream.flights",
             "connection.url": "arangodb-prmr.kca-demo.svc.cluster.local",
             "connection.jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1OTM1ODIxNDUsImlzcyI6ImFyYW5nb2RiIiwic2VydmVyX2lkIjoibXljbGllbnQifQ.irkCPiMXynLuDSiq-y5d9BfEsnWCLctdh2DwuSXZEO8",
-            "db.name": "airline"
+            "db.name": "_system"
         }
     }'
 
@@ -36,6 +36,8 @@ curl "$(minikube -n kca-demo service kafka-connect --url)/connectors/demo-arango
 
 curl --request POST \
     --url "$(minikube -n kca-demo service kafka-connect --url)/connectors/demo-arangodb-connector/tasks/0/restart"
+
+curl --verbose -H 'Authorization: bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1OTM1ODIxNDUsImlzcyI6ImFyYW5nb2RiIiwic2VydmVyX2lkIjoibXljbGllbnQifQ.irkCPiMXynLuDSiq-y5d9BfEsnWCLctdh2DwuSXZEO8' http://172.17.0.18:8529/_db/airline/_api/wal/tail
 ```
 
 ```
@@ -44,53 +46,16 @@ curl '172.17.0.18/_api/wal/tail' -H 'Authorization: bearer eyJ0eXAiOiJKV1QiLCJhb
 ```
 
 ```
-java.lang.IllegalArgumentException: target values must be absolute.
- at feign.RequestTemplate.target(RequestTemplate.java:493)
- at feign.Target$HardCodedTarget.apply(Target.java:101)
- at feign.SynchronousMethodHandler.targetRequest(SynchronousMethodHandler.java:163)
- at feign.SynchronousMethodHandler.executeAndDecode(SynchronousMethodHandler.java:110)
- at feign.SynchronousMethodHandler.invoke(SynchronousMethodHandler.java:89)
- at feign.ReflectiveFeign$FeignInvocationHandler.invoke(ReflectiveFeign.java:100)
- at io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.$Proxy40.tailWal(Unknown Source)
- at io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.ArangoDb.tailWal(ArangoDb.java:38)
- at io.github.jaredpetersen.kafkaconnectarangodb.source.reader.Reader.read(Reader.java:19)
- at io.github.jaredpetersen.kafkaconnectarangodb.source.ArangoDbSourceTask.poll(ArangoDbSourceTask.java:57)
- at org.apache.kafka.connect.runtime.WorkerSourceTask.poll(WorkerSourceTask.java:265)
- at org.apache.kafka.connect.runtime.WorkerSourceTask.execute(WorkerSourceTask.java:232)
- at org.apache.kafka.connect.runtime.WorkerTask.doRun(WorkerTask.java:177)
- at org.apache.kafka.connect.runtime.WorkerTask.run(WorkerTask.java:227)
- at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
- at java.util.concurrent.FutureTask.run(FutureTask.java:266)
- at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
- at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
- at java.lang.Thread.run(Thread.java:748)
-```
 
-```
-feign.RetryableException: Failed to connect to /172.17.0.17:80 executing GET http://172.17.0.17/_dbairline/_api/_wal/tail
- at feign.FeignException.errorExecuting(FeignException.java:249)
- at feign.SynchronousMethodHandler.executeAndDecode(SynchronousMethodHandler.java:129)
- at feign.SynchronousMethodHandler.invoke(SynchronousMethodHandler.java:89)
- at feign.ReflectiveFeign$FeignInvocationHandler.invoke(ReflectiveFeign.java:100)
- at io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.$Proxy39.tailWal(Unknown Source)
- at io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.ArangoDb.tailWal(ArangoDb.java:38)
- at io.github.jaredpetersen.kafkaconnectarangodb.source.reader.Reader.read(Reader.java:19)
- at io.github.jaredpetersen.kafkaconnectarangodb.source.ArangoDbSourceTask.poll(ArangoDbSourceTask.java:57)
- at org.apache.kafka.connect.runtime.WorkerSourceTask.poll(WorkerSourceTask.java:265)
- at org.apache.kafka.connect.runtime.WorkerSourceTask.execute(WorkerSourceTask.java:232)
- at org.apache.kafka.connect.runtime.WorkerTask.doRun(WorkerTask.java:177)
- at org.apache.kafka.connect.runtime.WorkerTask.run(WorkerTask.java:227)
- at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
- at java.util.concurrent.FutureTask.run(FutureTask.java:266)
- at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
- at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
- at java.lang.Thread.run(Thread.java:748)
 ```
 
 TODO Proxy arangodb to localhost for local testing because this is slow
 
 ## Write Records
 TODO
+
+https://www.arangodb.com/wp-content/uploads/2019/02/ArangoDB-GraphCourse_Beginners.pdf
+https://www.arangodb.com/arangodb_graphcourse_demodata/
 
 ## Validate
 TODO

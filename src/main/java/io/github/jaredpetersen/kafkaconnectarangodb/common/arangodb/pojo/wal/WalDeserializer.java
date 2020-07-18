@@ -10,10 +10,7 @@ import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.ope
 
 import java.io.IOException;
 
-class Deserializer extends JsonDeserializer<WalEntry> {
-  private static final int START_TRANSACTION_CODE = 2200;
-  private static final int COMMIT_TRANSACTION_CODE = 2201;
-  private static final int ABORT_TRANSACTION_CODE = 2202;
+class WalDeserializer extends JsonDeserializer<WalEntry> {
   private static final int REPSERT_DOCUMENT_CODE = 2300;
   private static final int REMOVE_DOCUMENT_CODE = 2302;
 

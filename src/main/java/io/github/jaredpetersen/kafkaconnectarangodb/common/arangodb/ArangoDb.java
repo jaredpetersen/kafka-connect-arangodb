@@ -1,13 +1,27 @@
 package io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Feign;
+import feign.Response;
+import feign.Util;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.okhttp.OkHttpClient;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.auth.JwtAuthInterceptor;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.WalEntry;
 
+import javax.ws.rs.core.UriBuilder;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.lang.reflect.Type;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * ArangoDB client library.
@@ -16,15 +30,22 @@ public class ArangoDb {
     private final ArangoDbClient client;
 
     private ArangoDb(Builder builder) {
-        final String url = builder.baseUrl
+        final String baseUrl = (builder.baseUrl.endsWith("/"))
+            ? builder.baseUrl.substring(0, builder.baseUrl.length() - 1)
+            : builder.baseUrl;
+        final String url = baseUrl
             + "/_db/"
             + builder.database
             + "/_api";
 
+        final ObjectMapper objectMapper = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         this.client = Feign.builder()
             .client(new OkHttpClient())
-            .encoder(new JacksonEncoder())
-            .decoder(new JacksonDecoder())
+            .encoder(new JacksonEncoder(objectMapper))
+            .decoder(new JacksonDecoder(objectMapper))
+            .mapAndDecode(this::preDecoder, new JacksonDecoder(objectMapper))
             .requestInterceptor(new JwtAuthInterceptor(builder.jwt))
             .target(ArangoDbClient.class, url);
     }
@@ -36,6 +57,28 @@ public class ArangoDb {
      */
     public List<WalEntry> tailWal(Long from) {
         return this.client.tailWal(from);
+    }
+
+    private Response preDecoder(Response response, Type type) {
+        final Response processedResponse;
+
+        if (response.headers().get("Content-Type").contains("application/x-arango-dump; charset=utf-8")) {
+            // x-arango-dump uses ndjson/jsonlines format and the feign jackson encoder does not support this
+            final String standardJson;
+            try (final Reader reader = response.body().asReader(StandardCharsets.UTF_8)) {
+                final BufferedReader bufferedReader = new BufferedReader(reader);
+                standardJson = "[" + bufferedReader.lines().collect(Collectors.joining(",")) + "]";
+            } catch (IOException exception) {
+                throw new RuntimeException("failed to decode x-arango-dump response");
+            }
+            processedResponse = response.toBuilder()
+                .body(standardJson, StandardCharsets.UTF_8)
+                .build();
+        } else {
+            processedResponse = response;
+        }
+
+        return processedResponse;
     }
 
     public static Builder builder() {

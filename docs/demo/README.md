@@ -16,13 +16,11 @@ Unfortunately, we have to peg the Kubernetes version to v1.17.6 due to a [bug in
 Now that we have a cluster, we'll need a Docker image that contains the Kafka Connect ArangoDB plugin. Navigate to `docker/` and run the following commands in a separate terminal to download the plugin and build the image for Minikube:
 ```bash
 curl -O 'https://search.maven.org/remotecontent?filepath=io/github/jaredpetersen/kafka-connect-arangodb/1.0.6/kafka-connect-arangodb-1.0.6.jar'
-eval $(minikube docker-env)
 docker build -t jaredpetersen/kafka-connect-arangodb:latest .
+minikube cache add jaredpetersen/kafka-connect-arangodb:latest
 ```
 
-Close out this terminal when you're done -- we want to go back to our normal Docker environment.
-
-Alternatively, build from source with `mvn package` at the root of this repository to get the JAR file.
+Alternatively, build from source with `mvn package` at the root of this repository to get the JAR file. If you need to update this image later, you can update the minikube image cache with `minikube cache reload`.
 
 ### Kubernetes Manifests
 Let's start running everything. We're going to be using [kube-arangodb](https://github.com/arangodb/kube-arangodb) to help us manage our ArangoDB cluster and just plain manifests for Zookeeper, Apache Kafka, and Kafka Connect.
