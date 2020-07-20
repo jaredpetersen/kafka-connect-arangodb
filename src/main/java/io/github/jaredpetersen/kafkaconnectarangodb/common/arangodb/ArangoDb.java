@@ -4,22 +4,17 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Feign;
 import feign.Response;
-import feign.Util;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.okhttp.OkHttpClient;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.auth.JwtAuthInterceptor;
 import io.github.jaredpetersen.kafkaconnectarangodb.common.arangodb.pojo.wal.WalEntry;
 
-import javax.ws.rs.core.UriBuilder;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Type;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,10 +26,10 @@ public class ArangoDb {
 
     private ArangoDb(Builder builder) {
         final String baseUrl = (builder.baseUrl.endsWith("/"))
-            ? builder.baseUrl.substring(0, builder.baseUrl.length() - 1)
-            : builder.baseUrl;
+            ? builder.baseUrl
+            : builder.baseUrl + "/";
         final String url = baseUrl
-            + "/_db/"
+            + "_db/"
             + builder.database
             + "/_api";
 
